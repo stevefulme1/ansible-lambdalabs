@@ -87,7 +87,7 @@ def main():
         name=dict(type="str", required=True),
         instance_type=dict(type="str", required=True),
         count=dict(type="int", required=True),
-        ssh_key_names=dict(type="list", elements="str", required=True),
+        ssh_key_names=dict(type="list", elements="str", required=True, no_log=False),
         file_system_names=dict(type="list", elements="str", default=[]),
         region=dict(type="str", required=True),
     )

@@ -90,7 +90,7 @@ def main():
         desired_count=dict(type="int", required=True),
         instance_type=dict(type="str"),
         region=dict(type="str"),
-        ssh_key_names=dict(type="list", elements="str", default=[]),
+        ssh_key_names=dict(type="list", elements="str", default=[], no_log=False),
         file_system_names=dict(type="list", elements="str", default=[]),
     )
     module = AnsibleModule(argument_spec=spec, supports_check_mode=True)

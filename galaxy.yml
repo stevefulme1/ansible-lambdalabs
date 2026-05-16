@@ -27,4 +27,3 @@ build_ignore:
   - .github
   - tests
   - changelogs
-

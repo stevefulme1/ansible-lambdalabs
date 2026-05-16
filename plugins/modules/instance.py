@@ -121,7 +121,7 @@ def main():
         name=dict(type="str"),
         instance_type=dict(type="str"),
         region=dict(type="str"),
-        ssh_key_names=dict(type="list", elements="str", default=[]),
+        ssh_key_names=dict(type="list", elements="str", default=[], no_log=False),
         file_system_names=dict(type="list", elements="str", default=[]),
         quantity=dict(type="int", default=1),
         instance_ids=dict(type="list", elements="str"),
