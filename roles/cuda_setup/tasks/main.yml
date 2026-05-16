@@ -1,0 +1,63 @@
+---
+- name: Check for NVIDIA GPU
+  ansible.builtin.command:
+    cmd: lspci
+  register: cuda_setup_lspci
+  changed_when: false
+
+- name: Fail if no NVIDIA GPU detected
+  ansible.builtin.fail:
+    msg: "No NVIDIA GPU detected on this host."
+  when: "'NVIDIA' not in cuda_setup_lspci.stdout"
+
+- name: Install kernel headers
+  ansible.builtin.apt:
+    name:
+      - linux-headers-{{ ansible_kernel }}
+      - build-essential
+    state: present
+    update_cache: true
+
+- name: Add NVIDIA package repository key
+  ansible.builtin.apt_key:
+    url: https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2204/x86_64/3bf863cc.pub
+    state: present
+
+- name: Add NVIDIA CUDA repository
+  ansible.builtin.apt_repository:
+    repo: "deb https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2204/x86_64/ /"
+    state: present
+    filename: cuda
+
+- name: Install NVIDIA driver
+  ansible.builtin.apt:
+    name: "nvidia-driver-{{ cuda_setup_driver_version }}"
+    state: present
+    update_cache: true
+
+- name: Install CUDA toolkit
+  ansible.builtin.apt:
+    name: "cuda-toolkit-{{ cuda_setup_cuda_version | replace('.', '-') }}"
+    state: present
+
+- name: Add CUDA to PATH
+  ansible.builtin.lineinfile:
+    path: /etc/profile.d/cuda.sh
+    line: 'export PATH=/usr/local/cuda-{{ cuda_setup_cuda_version }}/bin:$PATH'
+    create: true
+    mode: "0644"
+
+- name: Add CUDA libraries to LD_LIBRARY_PATH
+  ansible.builtin.lineinfile:
+    path: /etc/profile.d/cuda.sh
+    line: 'export LD_LIBRARY_PATH=/usr/local/cuda-{{ cuda_setup_cuda_version }}/lib64:$LD_LIBRARY_PATH'
+
+- name: Verify nvidia-smi
+  ansible.builtin.command:
+    cmd: nvidia-smi
+  register: cuda_setup_smi
+  changed_when: false
+
+- name: Display GPU info
+  ansible.builtin.debug:
+    msg: "{{ cuda_setup_smi.stdout_lines[:5] }}"

@@ -1,0 +1,67 @@
+---
+- name: Install JupyterLab
+  ansible.builtin.pip:
+    name:
+      - jupyterlab
+      - ipywidgets
+    state: present
+
+- name: Create notebook directory
+  ansible.builtin.file:
+    path: "{{ jupyter_server_notebook_dir }}"
+    state: directory
+    owner: ubuntu
+    group: ubuntu
+    mode: "0755"
+
+- name: Generate Jupyter config directory
+  ansible.builtin.file:
+    path: /home/ubuntu/.jupyter
+    state: directory
+    owner: ubuntu
+    group: ubuntu
+    mode: "0700"
+
+- name: Configure JupyterLab
+  ansible.builtin.copy:
+    dest: /home/ubuntu/.jupyter/jupyter_lab_config.py
+    owner: ubuntu
+    group: ubuntu
+    mode: "0600"
+    content: |
+      c.ServerApp.ip = '{{ jupyter_server_allow_remote | ternary("0.0.0.0", "127.0.0.1") }}'
+      c.ServerApp.port = {{ jupyter_server_port }}
+      c.ServerApp.open_browser = False
+      c.ServerApp.notebook_dir = '{{ jupyter_server_notebook_dir }}'
+      {% if jupyter_server_password %}
+      c.ServerApp.password = '{{ jupyter_server_password }}'
+      {% else %}
+      c.ServerApp.token = ''
+      c.ServerApp.password = ''
+      {% endif %}
+
+- name: Create JupyterLab systemd service
+  ansible.builtin.copy:
+    dest: /etc/systemd/system/jupyterlab.service
+    content: |
+      [Unit]
+      Description=JupyterLab Server
+      After=network.target
+
+      [Service]
+      Type=simple
+      User=ubuntu
+      ExecStart=/usr/local/bin/jupyter lab --config=/home/ubuntu/.jupyter/jupyter_lab_config.py
+      Restart=on-failure
+      RestartSec=5
+
+      [Install]
+      WantedBy=multi-user.target
+    mode: "0644"
+
+- name: Enable and start JupyterLab
+  ansible.builtin.systemd:
+    name: jupyterlab
+    enabled: true
+    state: started
+    daemon_reload: true

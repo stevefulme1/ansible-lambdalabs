@@ -1,0 +1,5 @@
+---
+model_checkpoint_checkpoint_dir: /opt/checkpoints
+model_checkpoint_max_checkpoints: 5
+model_checkpoint_sync_to_filesystem: ""
+model_checkpoint_sync_interval: 30

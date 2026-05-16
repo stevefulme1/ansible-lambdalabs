@@ -1,0 +1,46 @@
+---
+- name: Install vLLM
+  ansible.builtin.pip:
+    name: vllm
+    state: present
+
+- name: Create vLLM systemd service
+  ansible.builtin.copy:
+    dest: /etc/systemd/system/vllm.service
+    content: |
+      [Unit]
+      Description=vLLM Inference Server
+      After=network.target
+
+      [Service]
+      Type=simple
+      ExecStart=/usr/local/bin/python -m vllm.entrypoints.openai.api_server \
+        --model {{ vllm_inference_model_name }} \
+        --host {{ vllm_inference_host }} \
+        --port {{ vllm_inference_port }} \
+        --gpu-memory-utilization {{ vllm_inference_gpu_memory_utilization }} \
+        --max-model-len {{ vllm_inference_max_model_len }} \
+        --tensor-parallel-size {{ vllm_inference_tensor_parallel_size }}
+      Restart=on-failure
+      RestartSec=10
+
+      [Install]
+      WantedBy=multi-user.target
+    mode: "0644"
+  notify: Restart vllm
+
+- name: Enable and start vLLM service
+  ansible.builtin.systemd:
+    name: vllm
+    enabled: true
+    state: started
+    daemon_reload: true
+
+- name: Wait for vLLM to become healthy
+  ansible.builtin.uri:
+    url: "http://localhost:{{ vllm_inference_port }}/health"
+    status_code: 200
+  register: vllm_inference_health
+  retries: 30
+  delay: 10
+  until: vllm_inference_health.status == 200

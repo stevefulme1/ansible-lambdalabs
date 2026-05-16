@@ -1,0 +1,54 @@
+---
+- name: Install MLflow
+  ansible.builtin.pip:
+    name:
+      - mlflow
+      - boto3
+    state: present
+
+- name: Create MLflow directories
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: directory
+    mode: "0755"
+  loop:
+    - /opt/mlflow
+    - "{{ mlflow_tracking_artifact_root }}"
+
+- name: Create MLflow systemd service
+  ansible.builtin.copy:
+    dest: /etc/systemd/system/mlflow.service
+    content: |
+      [Unit]
+      Description=MLflow Tracking Server
+      After=network.target
+
+      [Service]
+      Type=simple
+      ExecStart=/usr/local/bin/mlflow server \
+        --backend-store-uri {{ mlflow_tracking_backend_store }} \
+        --default-artifact-root {{ mlflow_tracking_artifact_root }} \
+        --host {{ mlflow_tracking_host }} \
+        --port {{ mlflow_tracking_port }}
+      Restart=on-failure
+      RestartSec=10
+
+      [Install]
+      WantedBy=multi-user.target
+    mode: "0644"
+
+- name: Enable and start MLflow
+  ansible.builtin.systemd:
+    name: mlflow
+    enabled: true
+    state: started
+    daemon_reload: true
+
+- name: Wait for MLflow to become healthy
+  ansible.builtin.uri:
+    url: "http://localhost:{{ mlflow_tracking_port }}/health"
+    status_code: 200
+  register: mlflow_tracking_health
+  retries: 10
+  delay: 5
+  until: mlflow_tracking_health.status == 200

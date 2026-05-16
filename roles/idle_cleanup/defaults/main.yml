@@ -1,0 +1,4 @@
+---
+idle_cleanup_idle_threshold_minutes: 60
+idle_cleanup_check_interval: 5
+idle_cleanup_api_key: "{{ lambda_api_key | default('') }}"

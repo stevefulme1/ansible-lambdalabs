@@ -1,0 +1,5 @@
+---
+cost_tracker_budget_limit: 1000
+cost_tracker_notification_email: ""
+cost_tracker_api_key: "{{ lambda_api_key | default('') }}"
+cost_tracker_check_interval: 60

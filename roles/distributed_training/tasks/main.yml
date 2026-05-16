@@ -1,0 +1,46 @@
+---
+- name: Set distributed training environment variables
+  ansible.builtin.lineinfile:
+    path: /etc/profile.d/distributed.sh
+    line: "{{ item }}"
+    create: true
+    mode: "0644"
+  loop:
+    - "export MASTER_ADDR={{ distributed_training_master_addr }}"
+    - "export MASTER_PORT={{ distributed_training_master_port }}"
+    - "export WORLD_SIZE={{ distributed_training_world_size }}"
+    - "export NCCL_DEBUG={{ distributed_training_nccl_debug }}"
+    - "export NCCL_SOCKET_IFNAME={{ distributed_training_nccl_socket_ifname }}"
+    - "export NCCL_IB_DISABLE={{ distributed_training_nccl_ib_disable }}"
+
+- name: Set node rank
+  ansible.builtin.lineinfile:
+    path: /etc/profile.d/distributed.sh
+    line: "export RANK={{ groups['all'].index(inventory_hostname) }}"
+
+- name: Set local rank to 0
+  ansible.builtin.lineinfile:
+    path: /etc/profile.d/distributed.sh
+    line: "export LOCAL_RANK=0"
+
+- name: Configure NCCL tuning
+  ansible.builtin.copy:
+    dest: /etc/nccl.conf
+    content: |
+      NCCL_DEBUG={{ distributed_training_nccl_debug }}
+      NCCL_SOCKET_IFNAME={{ distributed_training_nccl_socket_ifname }}
+      NCCL_IB_DISABLE={{ distributed_training_nccl_ib_disable }}
+    mode: "0644"
+
+- name: Verify inter-node connectivity to master
+  ansible.builtin.wait_for:
+    host: "{{ distributed_training_master_addr }}"
+    port: 22
+    timeout: 30
+  when: inventory_hostname != groups['all'][0]
+
+- name: Display distributed config summary
+  ansible.builtin.debug:
+    msg: >-
+      Node {{ groups['all'].index(inventory_hostname) }}/{{ distributed_training_world_size }}
+      — master={{ distributed_training_master_addr }}:{{ distributed_training_master_port }}

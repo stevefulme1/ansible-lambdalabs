@@ -1,0 +1,5 @@
+---
+jupyter_server_port: 8888
+jupyter_server_password: ""
+jupyter_server_allow_remote: true
+jupyter_server_notebook_dir: /home/ubuntu/notebooks

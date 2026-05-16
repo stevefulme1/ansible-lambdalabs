@@ -1,0 +1,30 @@
+---
+namespace: stevefulme1
+name: lambdalabs
+version: 1.0.0
+readme: README.md
+authors:
+  - Steve Fulmer
+description: >-
+  Ansible collection for Lambda Labs GPU Cloud — instance lifecycle,
+  cluster operations, filesystem management, firewall rules, and
+  ML/AI operational roles (CUDA, PyTorch, vLLM, Jupyter, MLflow).
+license_file: LICENSE
+tags:
+  - lambda
+  - gpu
+  - ai
+  - ml
+  - training
+  - inference
+  - cuda
+  - cloud
+  - automation
+dependencies: {}
+repository: https://github.com/stevefulmer/ansible-lambdalabs
+issues: https://github.com/stevefulmer/ansible-lambdalabs/issues
+build_ignore:
+  - .github
+  - tests
+  - changelogs
+requires_ansible: ">=2.16"

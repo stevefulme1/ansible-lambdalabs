@@ -1,0 +1,10 @@
+---
+pytorch_environment_python_version: "3.11"
+pytorch_environment_pytorch_version: "2.3"
+pytorch_environment_use_conda: true
+pytorch_environment_env_name: training
+pytorch_environment_extra_packages:
+  - transformers
+  - datasets
+  - accelerate
+  - tensorboard

@@ -1,0 +1,61 @@
+---
+- name: Install GPU health monitoring script
+  ansible.builtin.copy:
+    dest: /usr/local/bin/gpu-health-check.sh
+    mode: "0755"
+    content: |
+      #!/usr/bin/env bash
+      # Monitor GPU temperature and memory, log warnings.
+      set -euo pipefail
+
+      TEMP_THRESHOLD={{ gpu_health_monitor_alert_temp_threshold }}
+      MEM_THRESHOLD={{ gpu_health_monitor_alert_memory_threshold }}
+
+      nvidia-smi --query-gpu=index,temperature.gpu,memory.used,memory.total,utilization.gpu \
+        --format=csv,noheader,nounits | while IFS=', ' read -r idx temp mem_used mem_total gpu_util; do
+
+        if [ "${temp}" -ge "${TEMP_THRESHOLD}" ]; then
+          logger -t gpu-health "WARNING: GPU ${idx} temperature ${temp}C exceeds threshold ${TEMP_THRESHOLD}C"
+        fi
+
+        if [ "${mem_total}" -gt 0 ]; then
+          mem_pct=$(( mem_used * 100 / mem_total ))
+          if [ "${mem_pct}" -ge "${MEM_THRESHOLD}" ]; then
+            logger -t gpu-health "WARNING: GPU ${idx} memory ${mem_pct}% exceeds threshold ${MEM_THRESHOLD}%"
+          fi
+        fi
+      done
+
+- name: Create systemd timer for GPU health check
+  ansible.builtin.copy:
+    dest: /etc/systemd/system/gpu-health-check.timer
+    content: |
+      [Unit]
+      Description=GPU health monitoring timer
+
+      [Timer]
+      OnBootSec=1min
+      OnUnitActiveSec={{ gpu_health_monitor_check_interval }}min
+
+      [Install]
+      WantedBy=timers.target
+    mode: "0644"
+
+- name: Create systemd service for GPU health check
+  ansible.builtin.copy:
+    dest: /etc/systemd/system/gpu-health-check.service
+    content: |
+      [Unit]
+      Description=GPU health check
+
+      [Service]
+      Type=oneshot
+      ExecStart=/usr/local/bin/gpu-health-check.sh
+    mode: "0644"
+
+- name: Enable and start GPU health timer
+  ansible.builtin.systemd:
+    name: gpu-health-check.timer
+    enabled: true
+    state: started
+    daemon_reload: true

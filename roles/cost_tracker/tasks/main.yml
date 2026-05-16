@@ -1,0 +1,46 @@
+---
+- name: Install cost tracking script
+  ansible.builtin.copy:
+    dest: /usr/local/bin/lambda-cost-tracker.sh
+    mode: "0755"
+    content: |
+      #!/usr/bin/env bash
+      # Query Lambda API for running instances, estimate hourly cost.
+      set -euo pipefail
+
+      API_KEY="{{ cost_tracker_api_key }}"
+      BUDGET={{ cost_tracker_budget_limit }}
+      EMAIL="{{ cost_tracker_notification_email }}"
+
+      response=$(curl -s "https://cloud.lambda.ai/api/v1/instances" \
+        -H "Authorization: Bearer ${API_KEY}")
+
+      count=$(echo "${response}" | python3 -c "
+      import sys, json
+      data = json.load(sys.stdin).get('data', [])
+      active = [i for i in data if i.get('status') == 'active']
+      total_cents = 0
+      for i in active:
+          itype = i.get('instance_type', {})
+          total_cents += itype.get('price_cents_per_hour', 0)
+      hourly = total_cents / 100.0
+      daily = hourly * 24
+      monthly = daily * 30
+      print(f'{len(active)} instances, \${hourly:.2f}/hr, \${daily:.2f}/day, \${monthly:.0f}/mo est.')
+      if monthly > ${BUDGET}:
+          print('BUDGET_EXCEEDED')
+      ")
+
+      logger -t cost-tracker "${count}"
+
+      if echo "${count}" | grep -q "BUDGET_EXCEEDED" && [ -n "${EMAIL}" ]; then
+        echo "Lambda Labs monthly cost estimate exceeds budget of \$${BUDGET}" | \
+          mail -s "Lambda Labs Budget Alert" "${EMAIL}" 2>/dev/null || true
+      fi
+
+- name: Create cost tracker cron job
+  ansible.builtin.cron:
+    name: lambda-cost-tracker
+    minute: "0"
+    job: /usr/local/bin/lambda-cost-tracker.sh
+    user: root

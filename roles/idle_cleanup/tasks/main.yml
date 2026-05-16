@@ -1,0 +1,65 @@
+---
+- name: Install idle monitoring script
+  ansible.builtin.copy:
+    dest: /usr/local/bin/lambda-idle-check.sh
+    mode: "0755"
+    content: |
+      #!/usr/bin/env bash
+      # Checks GPU utilization; if idle beyond threshold, self-terminates.
+      set -euo pipefail
+
+      THRESHOLD={{ idle_cleanup_idle_threshold_minutes }}
+      IDLE_FILE=/tmp/.lambda_idle_counter
+
+      gpu_util=$(nvidia-smi --query-gpu=utilization.gpu --format=csv,noheader,nounits 2>/dev/null | head -1 || echo "0")
+
+      if [ "${gpu_util}" -lt 5 ]; then
+        count=$(cat "${IDLE_FILE}" 2>/dev/null || echo 0)
+        count=$((count + {{ idle_cleanup_check_interval }}))
+        echo "${count}" > "${IDLE_FILE}"
+
+        if [ "${count}" -ge "${THRESHOLD}" ]; then
+          instance_id=$(curl -s http://169.254.169.254/latest/meta-data/instance-id 2>/dev/null || hostname)
+          logger -t lambda-idle "GPU idle for ${count}m — terminating ${instance_id}"
+          curl -s -X POST "https://cloud.lambda.ai/api/v1/instance-operations/terminate" \
+            -H "Authorization: Bearer {{ idle_cleanup_api_key }}" \
+            -H "Content-Type: application/json" \
+            -d "{\"instance_ids\": [\"${instance_id}\"]}" || true
+        fi
+      else
+        rm -f "${IDLE_FILE}"
+      fi
+
+- name: Create systemd timer for idle check
+  ansible.builtin.copy:
+    dest: /etc/systemd/system/lambda-idle-check.timer
+    content: |
+      [Unit]
+      Description=Lambda GPU idle check timer
+
+      [Timer]
+      OnBootSec=5min
+      OnUnitActiveSec={{ idle_cleanup_check_interval }}min
+
+      [Install]
+      WantedBy=timers.target
+    mode: "0644"
+
+- name: Create systemd service for idle check
+  ansible.builtin.copy:
+    dest: /etc/systemd/system/lambda-idle-check.service
+    content: |
+      [Unit]
+      Description=Lambda GPU idle check
+
+      [Service]
+      Type=oneshot
+      ExecStart=/usr/local/bin/lambda-idle-check.sh
+    mode: "0644"
+
+- name: Enable and start idle check timer
+  ansible.builtin.systemd:
+    name: lambda-idle-check.timer
+    enabled: true
+    state: started
+    daemon_reload: true

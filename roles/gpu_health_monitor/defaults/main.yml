@@ -1,0 +1,4 @@
+---
+gpu_health_monitor_alert_temp_threshold: 85
+gpu_health_monitor_alert_memory_threshold: 95
+gpu_health_monitor_check_interval: 2

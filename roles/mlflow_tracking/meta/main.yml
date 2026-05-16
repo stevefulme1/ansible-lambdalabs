@@ -1,0 +1,12 @@
+---
+galaxy_info:
+  author: Steve Fulmer
+  description: Set up MLflow tracking server
+  license: GPL-3.0-or-later
+  min_ansible_version: "2.16"
+  platforms:
+    - name: Ubuntu
+      versions:
+        - jammy
+        - noble
+dependencies: []

@@ -1,0 +1,7 @@
+---
+distributed_training_master_addr: "{{ hostvars[groups['all'][0]]['ansible_host'] | default('localhost') }}"
+distributed_training_master_port: 29500
+distributed_training_world_size: "{{ groups['all'] | length }}"
+distributed_training_nccl_debug: "INFO"
+distributed_training_nccl_socket_ifname: "eth0"
+distributed_training_nccl_ib_disable: "0"

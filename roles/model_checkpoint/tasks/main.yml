@@ -1,0 +1,81 @@
+---
+- name: Create checkpoint directory
+  ansible.builtin.file:
+    path: "{{ model_checkpoint_checkpoint_dir }}"
+    state: directory
+    mode: "0755"
+
+- name: Install checkpoint rotation script
+  ansible.builtin.copy:
+    dest: /usr/local/bin/checkpoint-rotate.sh
+    mode: "0755"
+    content: |
+      #!/usr/bin/env bash
+      # Rotate model checkpoints — keep only the N most recent.
+      set -euo pipefail
+
+      CKPT_DIR="{{ model_checkpoint_checkpoint_dir }}"
+      MAX={{ model_checkpoint_max_checkpoints }}
+
+      count=$(find "${CKPT_DIR}" -mindepth 1 -maxdepth 1 -type d | wc -l)
+
+      if [ "${count}" -gt "${MAX}" ]; then
+        remove=$(( count - MAX ))
+        find "${CKPT_DIR}" -mindepth 1 -maxdepth 1 -type d -printf '%T+ %p\n' | \
+          sort | head -n "${remove}" | awk '{print $2}' | xargs rm -rf
+        logger -t checkpoint-rotate "Removed ${remove} old checkpoint(s), kept ${MAX}"
+      fi
+
+- name: Install checkpoint sync script
+  when: model_checkpoint_sync_to_filesystem | length > 0
+  ansible.builtin.copy:
+    dest: /usr/local/bin/checkpoint-sync.sh
+    mode: "0755"
+    content: |
+      #!/usr/bin/env bash
+      # Sync checkpoints to persistent filesystem.
+      set -euo pipefail
+
+      CKPT_DIR="{{ model_checkpoint_checkpoint_dir }}"
+      DEST="{{ model_checkpoint_sync_to_filesystem }}"
+
+      # Rotate first
+      /usr/local/bin/checkpoint-rotate.sh
+
+      # Sync to persistent storage
+      rsync -a --delete "${CKPT_DIR}/" "${DEST}/"
+      logger -t checkpoint-sync "Synced checkpoints to ${DEST}"
+
+- name: Create checkpoint management timer
+  ansible.builtin.copy:
+    dest: /etc/systemd/system/checkpoint-manage.timer
+    content: |
+      [Unit]
+      Description=Model checkpoint rotation and sync
+
+      [Timer]
+      OnBootSec=10min
+      OnUnitActiveSec={{ model_checkpoint_sync_interval }}min
+
+      [Install]
+      WantedBy=timers.target
+    mode: "0644"
+
+- name: Create checkpoint management service
+  ansible.builtin.copy:
+    dest: /etc/systemd/system/checkpoint-manage.service
+    content: |
+      [Unit]
+      Description=Checkpoint rotation and sync
+
+      [Service]
+      Type=oneshot
+      ExecStart={{ (model_checkpoint_sync_to_filesystem | length > 0) | ternary('/usr/local/bin/checkpoint-sync.sh', '/usr/local/bin/checkpoint-rotate.sh') }}
+    mode: "0644"
+
+- name: Enable and start checkpoint timer
+  ansible.builtin.systemd:
+    name: checkpoint-manage.timer
+    enabled: true
+    state: started
+    daemon_reload: true

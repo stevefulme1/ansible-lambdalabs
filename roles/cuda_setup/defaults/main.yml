@@ -1,0 +1,4 @@
+---
+cuda_setup_cuda_version: "12.4"
+cuda_setup_driver_version: "550"
+cuda_setup_install_samples: false

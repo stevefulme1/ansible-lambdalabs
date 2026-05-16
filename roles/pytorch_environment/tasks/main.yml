@@ -1,0 +1,55 @@
+---
+- name: Install Miniconda
+  when: pytorch_environment_use_conda
+  block:
+    - name: Download Miniconda installer
+      ansible.builtin.get_url:
+        url: https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh
+        dest: /tmp/miniconda.sh
+        mode: "0755"
+
+    - name: Install Miniconda
+      ansible.builtin.command:
+        cmd: /tmp/miniconda.sh -b -p /opt/miniconda
+        creates: /opt/miniconda/bin/conda
+
+    - name: Create conda environment
+      ansible.builtin.command:
+        cmd: >-
+          /opt/miniconda/bin/conda create -n {{ pytorch_environment_env_name }}
+          python={{ pytorch_environment_python_version }} -y
+        creates: "/opt/miniconda/envs/{{ pytorch_environment_env_name }}"
+
+    - name: Install PyTorch with CUDA (conda)
+      ansible.builtin.command:
+        cmd: >-
+          /opt/miniconda/bin/conda run -n {{ pytorch_environment_env_name }}
+          pip install torch=={{ pytorch_environment_pytorch_version }}
+          --index-url https://download.pytorch.org/whl/cu124
+      changed_when: true
+
+- name: Install via venv
+  when: not pytorch_environment_use_conda
+  block:
+    - name: Install Python and venv
+      ansible.builtin.apt:
+        name:
+          - "python{{ pytorch_environment_python_version }}"
+          - "python{{ pytorch_environment_python_version }}-venv"
+        state: present
+
+    - name: Create virtual environment
+      ansible.builtin.command:
+        cmd: "python{{ pytorch_environment_python_version }} -m venv /opt/{{ pytorch_environment_env_name }}"
+        creates: "/opt/{{ pytorch_environment_env_name }}/bin/python"
+
+    - name: Install PyTorch with CUDA (pip)
+      ansible.builtin.pip:
+        name: "torch=={{ pytorch_environment_pytorch_version }}"
+        virtualenv: "/opt/{{ pytorch_environment_env_name }}"
+        extra_args: "--index-url https://download.pytorch.org/whl/cu124"
+
+- name: Install common ML libraries
+  ansible.builtin.pip:
+    name: "{{ pytorch_environment_extra_packages }}"
+    virtualenv: "{{ pytorch_environment_use_conda | ternary('/opt/miniconda/envs/' + pytorch_environment_env_name, '/opt/' + pytorch_environment_env_name) }}"

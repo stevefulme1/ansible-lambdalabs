@@ -1,0 +1,5 @@
+---
+mlflow_tracking_backend_store: "sqlite:///opt/mlflow/mlflow.db"
+mlflow_tracking_artifact_root: /opt/mlflow/artifacts
+mlflow_tracking_port: 5000
+mlflow_tracking_host: "0.0.0.0"
