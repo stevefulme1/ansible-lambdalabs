@@ -1,4 +1,7 @@
-#!/usr/bin/python
+# -*- coding: utf-8 -*-
+# Copyright: (c) 2026, Steve Fulmer
+# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+
 # -*- coding: utf-8 -*-
 
 """Dynamic inventory plugin for Lambda Labs GPU Cloud."""
@@ -30,7 +33,7 @@ options:
     type: int
     default: 30
 author:
-  - Steve Fulmer
+  - Steve Fulmer (@stevefulme1)
 """
 
 EXAMPLES = r"""

@@ -1,3 +1,7 @@
+# -*- coding: utf-8 -*-
+# Copyright: (c) 2026, Steve Fulmer
+# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+
 """EDA event source plugin for Lambda Labs instance state changes."""
 
 from __future__ import absolute_import, division, print_function
@@ -47,7 +51,8 @@ async def main(queue: asyncio.Queue, args: dict[str, Any]) -> None:
 
                 if instance_filter:
                     instances = [
-                        i for i in instances
+                        i
+                        for i in instances
                         if i.get("name", "").startswith(instance_filter)
                         or i.get("id") == instance_filter
                     ]

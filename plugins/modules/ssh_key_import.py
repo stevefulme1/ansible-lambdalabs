@@ -1,5 +1,7 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
+# Copyright: (c) 2026, Steve Fulmer
+# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 
 """Import an SSH key from a local file path."""
 
@@ -26,7 +28,7 @@ options:
     type: path
     required: true
 author:
-  - Steve Fulmer
+  - Steve Fulmer (@stevefulme1)
 """
 
 EXAMPLES = r"""
@@ -62,7 +64,7 @@ def main():
     )
     module = AnsibleModule(argument_spec=spec, supports_check_mode=True)
 
-    key_path = os.path.expanduser(module.params["path"])
+    key_path = module.params["path"]
     if not os.path.isfile(key_path):
         module.fail_json(msg="SSH key file not found: {0}".format(key_path))
 

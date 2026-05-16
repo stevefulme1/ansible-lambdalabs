@@ -1,5 +1,7 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
+# Copyright: (c) 2026, Steve Fulmer
+# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 
 """List available Lambda Labs regions."""
 
@@ -17,7 +19,7 @@ version_added: "1.0.0"
 extends_documentation_fragment:
   - stevefulme1.lambdalabs.lambdalabs
 author:
-  - Steve Fulmer
+  - Steve Fulmer (@stevefulme1)
 """
 
 EXAMPLES = r"""
