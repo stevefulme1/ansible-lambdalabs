@@ -48,7 +48,7 @@ def main():
     client = LambdaClient(module.params["api_key"], module.params["timeout"])
 
     try:
-        result = client.get("instances")
+        client.get("instances")
         module.exit_json(changed=False, account={"valid": True})
     except LambdaError as exc:
         if exc.status_code == 401:

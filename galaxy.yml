@@ -27,4 +27,4 @@ build_ignore:
   - .github
   - tests
   - changelogs
-requires_ansible: ">=2.16"
+
