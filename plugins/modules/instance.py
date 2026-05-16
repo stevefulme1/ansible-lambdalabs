@@ -147,7 +147,9 @@ def main():
             )
         else:
             if module.check_mode:
-                module.exit_json(changed=True, terminated_ids=module.params["instance_ids"])
+                module.exit_json(
+                    changed=True, terminated_ids=module.params["instance_ids"]
+                )
             result = terminate_instances(client, module.params["instance_ids"])
             module.exit_json(
                 changed=True,

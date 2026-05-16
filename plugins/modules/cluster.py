@@ -92,7 +92,9 @@ def main():
     module = AnsibleModule(argument_spec=spec, supports_check_mode=True)
 
     if module.check_mode:
-        module.exit_json(changed=True, instance_ids=[], cluster_name=module.params["name"])
+        module.exit_json(
+            changed=True, instance_ids=[], cluster_name=module.params["name"]
+        )
 
     client = LambdaClient(module.params["api_key"], module.params["timeout"])
 

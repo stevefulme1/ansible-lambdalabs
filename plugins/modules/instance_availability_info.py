@@ -71,7 +71,8 @@ def main():
             filtered = {}
             for k, v in data.items():
                 regions = [
-                    r for r in v.get("regions_with_capacity_available", [])
+                    r
+                    for r in v.get("regions_with_capacity_available", [])
                     if r.get("name") == region
                 ]
                 if regions:

@@ -44,7 +44,9 @@ from ansible_collections.stevefulme1.lambdalabs.plugins.module_utils.lambda_clie
 
 
 def main():
-    module = AnsibleModule(argument_spec=lambda_argument_spec(), supports_check_mode=True)
+    module = AnsibleModule(
+        argument_spec=lambda_argument_spec(), supports_check_mode=True
+    )
     client = LambdaClient(module.params["api_key"], module.params["timeout"])
 
     try:

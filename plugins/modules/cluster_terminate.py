@@ -58,8 +58,10 @@ def main():
         result = client.get("instances")
         cluster_name = module.params["name"]
         ids = [
-            i["id"] for i in result.get("data", [])
-            if (i.get("name") or "").startswith(cluster_name) and i.get("status") != "terminated"
+            i["id"]
+            for i in result.get("data", [])
+            if (i.get("name") or "").startswith(cluster_name)
+            and i.get("status") != "terminated"
         ]
 
         if not ids:

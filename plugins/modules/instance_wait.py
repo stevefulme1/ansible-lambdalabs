@@ -94,7 +94,9 @@ def main():
             elapsed = int(time.time() - start)
             if elapsed >= module.params["max_wait"]:
                 module.fail_json(
-                    msg="Timed out waiting for state '{0}' after {1}s".format(target, elapsed),
+                    msg="Timed out waiting for state '{0}' after {1}s".format(
+                        target, elapsed
+                    ),
                     elapsed=elapsed,
                 )
 

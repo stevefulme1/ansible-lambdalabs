@@ -82,7 +82,9 @@ jobs:
 
       - name: Run unit tests
         working-directory: ansible_collections/stevefulme1/lambdalabs
-        run: ansible-test units --python ${{ matrix.python }} -v --color yes
+        run: python -m pytest tests/unit/ -v --tb=short
+        env:
+          PYTHONPATH: ${{ github.workspace }}
 
   integration-mock:
     runs-on: ubuntu-latest

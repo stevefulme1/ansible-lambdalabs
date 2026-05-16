@@ -48,7 +48,6 @@ from ansible.module_utils.six.moves.urllib.error import HTTPError, URLError
 
 
 class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
-
     NAME = "lambda_inventory"
 
     def verify_file(self, path):
@@ -116,9 +115,7 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
             status = inst.get("status", "unknown")
             self.inventory.set_variable(hostname, "status", status)
 
-            filesystems = [
-                fs.get("name") for fs in inst.get("file_systems", [])
-            ]
+            filesystems = [fs.get("name") for fs in inst.get("file_systems", [])]
             self.inventory.set_variable(hostname, "filesystems", filesystems)
 
             # Groups

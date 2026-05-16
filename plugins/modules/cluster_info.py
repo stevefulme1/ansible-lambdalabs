@@ -58,7 +58,8 @@ def main():
         result = client.get("instances")
         cluster_name = module.params["name"]
         instances = [
-            i for i in result.get("data", [])
+            i
+            for i in result.get("data", [])
             if (i.get("name") or "").startswith(cluster_name)
         ]
         module.exit_json(changed=False, instances=instances)
