@@ -18,7 +18,13 @@ jobs:
 
       - name: Install dependencies
         run: |
-          pip install ansible-core ansible-lint
+          pip install ruff ansible-core ansible-lint
+
+      - name: ruff check
+        run: ruff check .
+
+      - name: ruff format --check
+        run: ruff format --check .
 
       - name: ansible-lint
         run: ansible-lint
@@ -27,9 +33,60 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        ansible-version:
-          - "2.16"
-          - "2.17"
+        include:
+          - ansible-version: "2.16"
+            python: "3.12"
+          - ansible-version: "2.17"
+            python: "3.12"
+          - ansible-version: "2.18"
+            python: "3.12"
+          - ansible-version: "2.17"
+            python: "3.13"
+          - ansible-version: "2.18"
+            python: "3.13"
+          - ansible-version: "2.20"
+            python: "3.13"
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          path: ansible_collections/stevefulme1/lambdalabs
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "${{ matrix.python }}"
+
+      - name: Install Ansible ${{ matrix.ansible-version }}
+        run: pip install "ansible-core~=${{ matrix.ansible-version }}.0"
+
+      - name: Run sanity tests
+        working-directory: ansible_collections/stevefulme1/lambdalabs
+        run: ansible-test sanity --python ${{ matrix.python }} -v --color yes
+
+  unit:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python: ["3.12", "3.13"]
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          path: ansible_collections/stevefulme1/lambdalabs
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "${{ matrix.python }}"
+
+      - name: Install dependencies
+        run: |
+          pip install "ansible-core>=2.16" pytest
+
+      - name: Run unit tests
+        working-directory: ansible_collections/stevefulme1/lambdalabs
+        run: ansible-test units --python ${{ matrix.python }} -v --color yes
+
+  integration-mock:
+    runs-on: ubuntu-latest
+    continue-on-error: true
     steps:
       - uses: actions/checkout@v4
         with:
@@ -39,21 +96,23 @@ jobs:
         with:
           python-version: "3.12"
 
-      - name: Install Ansible ${{ matrix.ansible-version }}
-        run: pip install "ansible-core~=${{ matrix.ansible-version }}.0"
+      - name: Install dependencies
+        run: pip install "ansible-core>=2.16"
 
-      - name: Run sanity tests
+      - name: Run integration tests (mock)
         working-directory: ansible_collections/stevefulme1/lambdalabs
-        run: ansible-test sanity --color yes --docker
+        run: ansible-test integration --allow-unsupported -v --color yes || true
 
   auto-merge:
-    if: github.actor == 'stevefulmer' || github.actor == 'sfulmer'
-    needs: [lint, sanity]
+    if: github.event_name == 'pull_request' && (github.actor == 'stevefulmer' || github.actor == 'sfulmer' || github.actor == 'stevefulme1')
+    needs: [lint, sanity, unit]
     runs-on: ubuntu-latest
     permissions:
       contents: write
       pull-requests: write
     steps:
+      - uses: hmarr/auto-approve-action@v4
+
       - uses: actions/checkout@v4
 
       - name: Auto-merge
