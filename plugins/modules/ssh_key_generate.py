@@ -32,7 +32,6 @@ EXAMPLES = r"""
     api_key: "{{ lambda_api_key }}"
     name: auto-key
   register: key
-  no_log: true
 """
 
 RETURN = r"""
