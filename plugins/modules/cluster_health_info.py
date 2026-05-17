@@ -23,8 +23,6 @@ options:
     description: Cluster name.
     type: str
     required: true
-author:
-  - Steve Fulmer (@stevefulme1)
   limit:
     description:
       - Maximum number of results to return.
@@ -35,6 +33,8 @@ author:
       - Number of results to skip for pagination.
     type: int
     default: 0
+author:
+  - Steve Fulmer (@stevefulme1)
 """
 
 EXAMPLES = r"""
