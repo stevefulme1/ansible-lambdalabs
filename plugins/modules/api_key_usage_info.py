@@ -21,6 +21,26 @@ extends_documentation_fragment:
 author:
   - Steve Fulmer (@stevefulme1)
 options:
+  api_key:
+    description:
+      - Lambda Labs API key for authentication.
+    type: str
+    required: true
+  limit:
+    description:
+      - Maximum number of results to return.
+    type: int
+    default: 100
+  offset:
+    description:
+      - Number of results to skip for pagination.
+    type: int
+    default: 0
+  timeout:
+    description:
+      - API request timeout in seconds.
+    type: int
+    default: 30
 """
 
 EXAMPLES = r"""
