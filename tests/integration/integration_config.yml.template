@@ -1,0 +1,5 @@
+---
+# Integration test configuration for stevefulme1.lambdalabs
+lambdalabs_api_key: "CHANGEME"
+validate_certs: true
+resource_prefix: "ansible-ci-lambdalabs"
