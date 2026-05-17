@@ -24,6 +24,16 @@ options:
     type: str
 author:
   - Steve Fulmer (@stevefulme1)
+  limit:
+    description:
+      - Maximum number of results to return.
+    type: int
+    default: 100
+  offset:
+    description:
+      - Number of results to skip for pagination.
+    type: int
+    default: 0
 """
 
 EXAMPLES = r"""
@@ -51,6 +61,10 @@ from ansible_collections.stevefulme1.lambdalabs.plugins.module_utils.lambda_clie
 def main():
     spec = lambda_argument_spec()
     spec.update(filesystem_id=dict(type="str"))
+    spec.update(
+        limit=dict(type='int', default=100),
+        offset=dict(type='int', default=0),
+    )
     module = AnsibleModule(argument_spec=spec, supports_check_mode=True)
     client = LambdaClient(module.params["api_key"], module.params["timeout"])
 
