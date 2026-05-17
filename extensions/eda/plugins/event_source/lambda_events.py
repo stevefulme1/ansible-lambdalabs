@@ -53,8 +53,7 @@ async def main(queue: asyncio.Queue, args: dict[str, Any]) -> None:
                     instances = [
                         i
                         for i in instances
-                        if i.get("name", "").startswith(instance_filter)
-                        or i.get("id") == instance_filter
+                        if i.get("name", "").startswith(instance_filter) or i.get("id") == instance_filter
                     ]
 
                 current_ids = set()

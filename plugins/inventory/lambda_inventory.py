@@ -136,12 +136,6 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
 
             # Constructed features
             strict = self.get_option("strict")
-            self._set_composite_vars(
-                self.get_option("compose"), inst, hostname, strict=strict
-            )
-            self._add_host_to_composed_groups(
-                self.get_option("groups"), inst, hostname, strict=strict
-            )
-            self._add_host_to_keyed_groups(
-                self.get_option("keyed_groups"), inst, hostname, strict=strict
-            )
+            self._set_composite_vars(self.get_option("compose"), inst, hostname, strict=strict)
+            self._add_host_to_composed_groups(self.get_option("groups"), inst, hostname, strict=strict)
+            self._add_host_to_keyed_groups(self.get_option("keyed_groups"), inst, hostname, strict=strict)

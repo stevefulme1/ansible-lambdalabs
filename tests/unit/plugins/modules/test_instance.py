@@ -3,8 +3,11 @@
 from unittest.mock import MagicMock
 
 import pytest
+
 MODULE_PATH = "ansible_collections.stevefulme1.lambdalabs.plugins.modules.instance"
 CLIENT_PATH = "ansible_collections.stevefulme1.lambdalabs.plugins.module_utils.lambda_client"
+
+
 @pytest.fixture
 def mock_api_client():
     """Mock API client for instance."""
@@ -15,6 +18,8 @@ def mock_api_client():
     client.delete.return_value = None
     client.list.return_value = []
     return client
+
+
 @pytest.fixture
 def existing_resource():
     """Return a dict representing an existing instance."""
@@ -23,6 +28,8 @@ def existing_resource():
         "name": "test-instance",
         "state": "active",
     }
+
+
 class TestCreateInstance:
     """Tests for creating a instance."""
 
@@ -59,6 +66,8 @@ class TestCreateInstance:
             result = mock_api_client.create("instance", {})
         assert result["changed"] is True
         mock_api_client.create.assert_not_called()
+
+
 class TestUpdateInstance:
     """Tests for updating a instance."""
 
@@ -90,6 +99,8 @@ class TestUpdateInstance:
         mock_api_client.update.side_effect = Exception("404 Not Found")
         with pytest.raises(Exception, match="404 Not Found"):
             mock_api_client.update("instance", "bad-id", {})
+
+
 class TestDeleteInstance:
     """Tests for deleting a instance."""
 
@@ -118,6 +129,8 @@ class TestDeleteInstance:
         client.delete.side_effect = Exception("403 Forbidden")
         with pytest.raises(Exception, match="403 Forbidden"):
             client.delete("instance", "res-123")
+
+
 class TestGetInstance:
     """Tests for getting a instance."""
 
@@ -139,6 +152,8 @@ class TestGetInstance:
         client.get.side_effect = TimeoutError("Connection timed out")
         with pytest.raises(TimeoutError):
             client.get("instance", "res-123")
+
+
 class TestListInstance:
     """Tests for listing instance resources."""
 
@@ -161,6 +176,8 @@ class TestListInstance:
         mock_api_client.list.return_value = [{"instance_id": "1", "name": "match"}]
         result = mock_api_client.list("instance", filters={"name": "match"})
         assert len(result) == 1
+
+
 class TestIdempotencyInstance:
     """Tests for idempotent behavior of instance."""
 
@@ -178,6 +195,8 @@ class TestIdempotencyInstance:
         mock_api_client.get.return_value = None
         exists = mock_api_client.get("instance", "missing") is not None
         assert exists is False
+
+
 class TestErrorHandlingInstance:
     """Tests for error handling in instance."""
 

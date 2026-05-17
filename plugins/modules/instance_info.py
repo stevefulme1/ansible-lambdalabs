@@ -68,8 +68,8 @@ def main():
     spec = lambda_argument_spec()
     spec.update(instance_id=dict(type="str"))
     spec.update(
-        limit=dict(type='int', default=100),
-        offset=dict(type='int', default=0),
+        limit=dict(type="int", default=100),
+        offset=dict(type="int", default=0),
     )
     module = AnsibleModule(argument_spec=spec, supports_check_mode=True)
 

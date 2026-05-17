@@ -102,8 +102,7 @@ def main():
         current = [
             i
             for i in result.get("data", [])
-            if (i.get("name") or "").startswith(cluster_name)
-            and i.get("status") != "terminated"
+            if (i.get("name") or "").startswith(cluster_name) and i.get("status") != "terminated"
         ]
         current_count = len(current)
         desired = module.params["desired_count"]
@@ -135,9 +134,7 @@ def main():
         else:
             remove_count = current_count - desired
             remove_ids = [i["id"] for i in current[:remove_count]]
-            client.post(
-                "instance-operations/terminate", data={"instance_ids": remove_ids}
-            )
+            client.post("instance-operations/terminate", data={"instance_ids": remove_ids})
             module.exit_json(
                 changed=True,
                 current_count=desired,

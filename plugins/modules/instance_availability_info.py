@@ -68,8 +68,8 @@ def main():
         region=dict(type="str"),
     )
     spec.update(
-        limit=dict(type='int', default=100),
-        offset=dict(type='int', default=0),
+        limit=dict(type="int", default=100),
+        offset=dict(type="int", default=0),
     )
     module = AnsibleModule(argument_spec=spec, supports_check_mode=True)
     client = LambdaClient(module.params["api_key"], module.params["timeout"])
@@ -86,11 +86,7 @@ def main():
         if region:
             filtered = {}
             for k, v in data.items():
-                regions = [
-                    r
-                    for r in v.get("regions_with_capacity_available", [])
-                    if r.get("name") == region
-                ]
+                regions = [r for r in v.get("regions_with_capacity_available", []) if r.get("name") == region]
                 if regions:
                     entry = dict(v)
                     entry["regions_with_capacity_available"] = regions

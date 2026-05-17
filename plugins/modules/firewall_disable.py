@@ -60,9 +60,7 @@ def main():
     client = LambdaClient(module.params["api_key"], module.params["timeout"])
 
     try:
-        result = client.post(
-            "instances/{0}/firewall/disable".format(module.params["instance_id"])
-        )
+        result = client.post("instances/{0}/firewall/disable".format(module.params["instance_id"]))
         module.exit_json(changed=True, result=result.get("data", {}))
     except LambdaError as exc:
         module.fail_json(msg=str(exc))

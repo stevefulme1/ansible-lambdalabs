@@ -62,8 +62,7 @@ def main():
         ids = [
             i["id"]
             for i in result.get("data", [])
-            if (i.get("name") or "").startswith(cluster_name)
-            and i.get("status") != "terminated"
+            if (i.get("name") or "").startswith(cluster_name) and i.get("status") != "terminated"
         ]
 
         if not ids:

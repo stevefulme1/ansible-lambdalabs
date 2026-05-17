@@ -3,6 +3,7 @@
 from unittest.mock import MagicMock
 
 import pytest
+
 MODULE_PATH = "ansible_collections.stevefulme1.lambdalabs.plugins.modules.ssh_key_generate"
 CLIENT_PATH = "ansible_collections.stevefulme1.lambdalabs.plugins.module_utils.lambda_client"
 

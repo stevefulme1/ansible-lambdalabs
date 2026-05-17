@@ -64,8 +64,8 @@ def main():
     spec = lambda_argument_spec()
     spec.update(name=dict(type="str", required=True))
     spec.update(
-        limit=dict(type='int', default=100),
-        offset=dict(type='int', default=0),
+        limit=dict(type="int", default=100),
+        offset=dict(type="int", default=0),
     )
     module = AnsibleModule(argument_spec=spec, supports_check_mode=True)
     client = LambdaClient(module.params["api_key"], module.params["timeout"])
@@ -73,11 +73,7 @@ def main():
     try:
         result = client.get("instances")
         cluster_name = module.params["name"]
-        instances = [
-            i
-            for i in result.get("data", [])
-            if (i.get("name") or "").startswith(cluster_name)
-        ]
+        instances = [i for i in result.get("data", []) if (i.get("name") or "").startswith(cluster_name)]
         module.exit_json(changed=False, instances=instances)
     except LambdaError as exc:
         module.fail_json(msg=str(exc))

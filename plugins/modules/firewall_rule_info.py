@@ -64,16 +64,14 @@ def main():
     spec = lambda_argument_spec()
     spec.update(instance_id=dict(type="str", required=True))
     spec.update(
-        limit=dict(type='int', default=100),
-        offset=dict(type='int', default=0),
+        limit=dict(type="int", default=100),
+        offset=dict(type="int", default=0),
     )
     module = AnsibleModule(argument_spec=spec, supports_check_mode=True)
     client = LambdaClient(module.params["api_key"], module.params["timeout"])
 
     try:
-        result = client.get(
-            "instances/{0}/firewall-rules".format(module.params["instance_id"])
-        )
+        result = client.get("instances/{0}/firewall-rules".format(module.params["instance_id"]))
         module.exit_json(changed=False, rules=result.get("data", []))
     except LambdaError as exc:
         module.fail_json(msg=str(exc))

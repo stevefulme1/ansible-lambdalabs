@@ -3,8 +3,11 @@
 from unittest.mock import MagicMock
 
 import pytest
+
 MODULE_PATH = "ansible_collections.stevefulme1.lambdalabs.plugins.modules.filesystem"
 CLIENT_PATH = "ansible_collections.stevefulme1.lambdalabs.plugins.module_utils.lambda_client"
+
+
 @pytest.fixture
 def mock_api_client():
     """Mock API client for filesystem."""
@@ -15,6 +18,8 @@ def mock_api_client():
     client.delete.return_value = None
     client.list.return_value = []
     return client
+
+
 @pytest.fixture
 def existing_resource():
     """Return a dict representing an existing filesystem."""
@@ -23,6 +28,8 @@ def existing_resource():
         "name": "test-filesystem",
         "state": "active",
     }
+
+
 class TestCreateFilesystem:
     """Tests for creating a filesystem."""
 
@@ -59,6 +66,8 @@ class TestCreateFilesystem:
             result = mock_api_client.create("filesystem", {})
         assert result["changed"] is True
         mock_api_client.create.assert_not_called()
+
+
 class TestUpdateFilesystem:
     """Tests for updating a filesystem."""
 
@@ -90,6 +99,8 @@ class TestUpdateFilesystem:
         mock_api_client.update.side_effect = Exception("404 Not Found")
         with pytest.raises(Exception, match="404 Not Found"):
             mock_api_client.update("filesystem", "bad-id", {})
+
+
 class TestDeleteFilesystem:
     """Tests for deleting a filesystem."""
 
@@ -118,6 +129,8 @@ class TestDeleteFilesystem:
         client.delete.side_effect = Exception("403 Forbidden")
         with pytest.raises(Exception, match="403 Forbidden"):
             client.delete("filesystem", "res-123")
+
+
 class TestGetFilesystem:
     """Tests for getting a filesystem."""
 
@@ -139,6 +152,8 @@ class TestGetFilesystem:
         client.get.side_effect = TimeoutError("Connection timed out")
         with pytest.raises(TimeoutError):
             client.get("filesystem", "res-123")
+
+
 class TestListFilesystem:
     """Tests for listing filesystem resources."""
 
@@ -161,6 +176,8 @@ class TestListFilesystem:
         mock_api_client.list.return_value = [{"filesystem_id": "1", "name": "match"}]
         result = mock_api_client.list("filesystem", filters={"name": "match"})
         assert len(result) == 1
+
+
 class TestIdempotencyFilesystem:
     """Tests for idempotent behavior of filesystem."""
 
@@ -178,6 +195,8 @@ class TestIdempotencyFilesystem:
         mock_api_client.get.return_value = None
         exists = mock_api_client.get("filesystem", "missing") is not None
         assert exists is False
+
+
 class TestErrorHandlingFilesystem:
     """Tests for error handling in filesystem."""
 
