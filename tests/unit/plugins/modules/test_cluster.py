@@ -1,18 +1,10 @@
 """Unit tests for stevefulme1.lambdalabs.cluster module."""
 
-from __future__ import absolute_import, division, print_function
-
-__metaclass__ = type
-
-from unittest.mock import MagicMock, patch
+from unittest.mock import MagicMock
 
 import pytest
-
-
 MODULE_PATH = "ansible_collections.stevefulme1.lambdalabs.plugins.modules.cluster"
 CLIENT_PATH = "ansible_collections.stevefulme1.lambdalabs.plugins.module_utils.lambda_client"
-
-
 @pytest.fixture
 def mock_api_client():
     """Mock API client for cluster."""
@@ -23,8 +15,6 @@ def mock_api_client():
     client.delete.return_value = None
     client.list.return_value = []
     return client
-
-
 @pytest.fixture
 def existing_resource():
     """Return a dict representing an existing cluster."""
@@ -33,8 +23,6 @@ def existing_resource():
         "name": "test-cluster",
         "state": "active",
     }
-
-
 class TestCreateCluster:
     """Tests for creating a cluster."""
 
@@ -71,8 +59,6 @@ class TestCreateCluster:
             result = mock_api_client.create("cluster", {})
         assert result["changed"] is True
         mock_api_client.create.assert_not_called()
-
-
 class TestUpdateCluster:
     """Tests for updating a cluster."""
 
@@ -104,8 +90,6 @@ class TestUpdateCluster:
         mock_api_client.update.side_effect = Exception("404 Not Found")
         with pytest.raises(Exception, match="404 Not Found"):
             mock_api_client.update("cluster", "bad-id", {})
-
-
 class TestDeleteCluster:
     """Tests for deleting a cluster."""
 
@@ -134,8 +118,6 @@ class TestDeleteCluster:
         client.delete.side_effect = Exception("403 Forbidden")
         with pytest.raises(Exception, match="403 Forbidden"):
             client.delete("cluster", "res-123")
-
-
 class TestGetCluster:
     """Tests for getting a cluster."""
 
@@ -157,8 +139,6 @@ class TestGetCluster:
         client.get.side_effect = TimeoutError("Connection timed out")
         with pytest.raises(TimeoutError):
             client.get("cluster", "res-123")
-
-
 class TestListCluster:
     """Tests for listing cluster resources."""
 
@@ -181,8 +161,6 @@ class TestListCluster:
         mock_api_client.list.return_value = [{"cluster_id": "1", "name": "match"}]
         result = mock_api_client.list("cluster", filters={"name": "match"})
         assert len(result) == 1
-
-
 class TestIdempotencyCluster:
     """Tests for idempotent behavior of cluster."""
 
@@ -200,8 +178,6 @@ class TestIdempotencyCluster:
         mock_api_client.get.return_value = None
         exists = mock_api_client.get("cluster", "missing") is not None
         assert exists is False
-
-
 class TestErrorHandlingCluster:
     """Tests for error handling in cluster."""
 

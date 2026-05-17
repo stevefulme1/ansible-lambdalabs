@@ -1,18 +1,10 @@
 """Unit tests for stevefulme1.lambdalabs.ssh_key module."""
 
-from __future__ import absolute_import, division, print_function
-
-__metaclass__ = type
-
-from unittest.mock import MagicMock, patch
+from unittest.mock import MagicMock
 
 import pytest
-
-
 MODULE_PATH = "ansible_collections.stevefulme1.lambdalabs.plugins.modules.ssh_key"
 CLIENT_PATH = "ansible_collections.stevefulme1.lambdalabs.plugins.module_utils.lambda_client"
-
-
 @pytest.fixture
 def mock_api_client():
     """Mock API client for ssh_key."""
@@ -23,8 +15,6 @@ def mock_api_client():
     client.delete.return_value = None
     client.list.return_value = []
     return client
-
-
 @pytest.fixture
 def existing_resource():
     """Return a dict representing an existing ssh_key."""
@@ -33,8 +23,6 @@ def existing_resource():
         "name": "test-ssh_key",
         "state": "active",
     }
-
-
 class TestCreateSshKey:
     """Tests for creating a ssh_key."""
 
@@ -71,8 +59,6 @@ class TestCreateSshKey:
             result = mock_api_client.create("ssh_key", {})
         assert result["changed"] is True
         mock_api_client.create.assert_not_called()
-
-
 class TestUpdateSshKey:
     """Tests for updating a ssh_key."""
 
@@ -104,8 +90,6 @@ class TestUpdateSshKey:
         mock_api_client.update.side_effect = Exception("404 Not Found")
         with pytest.raises(Exception, match="404 Not Found"):
             mock_api_client.update("ssh_key", "bad-id", {})
-
-
 class TestDeleteSshKey:
     """Tests for deleting a ssh_key."""
 
@@ -134,8 +118,6 @@ class TestDeleteSshKey:
         client.delete.side_effect = Exception("403 Forbidden")
         with pytest.raises(Exception, match="403 Forbidden"):
             client.delete("ssh_key", "res-123")
-
-
 class TestGetSshKey:
     """Tests for getting a ssh_key."""
 
@@ -157,8 +139,6 @@ class TestGetSshKey:
         client.get.side_effect = TimeoutError("Connection timed out")
         with pytest.raises(TimeoutError):
             client.get("ssh_key", "res-123")
-
-
 class TestListSshKey:
     """Tests for listing ssh_key resources."""
 
@@ -181,8 +161,6 @@ class TestListSshKey:
         mock_api_client.list.return_value = [{"key_id": "1", "name": "match"}]
         result = mock_api_client.list("ssh_key", filters={"name": "match"})
         assert len(result) == 1
-
-
 class TestIdempotencySshKey:
     """Tests for idempotent behavior of ssh_key."""
 
@@ -200,8 +178,6 @@ class TestIdempotencySshKey:
         mock_api_client.get.return_value = None
         exists = mock_api_client.get("ssh_key", "missing") is not None
         assert exists is False
-
-
 class TestErrorHandlingSshKey:
     """Tests for error handling in ssh_key."""
 

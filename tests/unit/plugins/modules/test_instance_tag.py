@@ -1,18 +1,10 @@
 """Unit tests for stevefulme1.lambdalabs.instance_tag module."""
 
-from __future__ import absolute_import, division, print_function
-
-__metaclass__ = type
-
-from unittest.mock import MagicMock, patch
+from unittest.mock import MagicMock
 
 import pytest
-
-
 MODULE_PATH = "ansible_collections.stevefulme1.lambdalabs.plugins.modules.instance_tag"
 CLIENT_PATH = "ansible_collections.stevefulme1.lambdalabs.plugins.module_utils.lambda_client"
-
-
 @pytest.fixture
 def mock_api_client():
     """Mock API client for instance_tag."""
@@ -23,8 +15,6 @@ def mock_api_client():
     client.delete.return_value = None
     client.list.return_value = []
     return client
-
-
 @pytest.fixture
 def existing_resource():
     """Return a dict representing an existing instance_tag."""
@@ -33,8 +23,6 @@ def existing_resource():
         "key": "test-instance_tag",
         "state": "active",
     }
-
-
 class TestCreateInstanceTag:
     """Tests for creating a instance_tag."""
 
@@ -71,8 +59,6 @@ class TestCreateInstanceTag:
             result = mock_api_client.create("instance_tag", {})
         assert result["changed"] is True
         mock_api_client.create.assert_not_called()
-
-
 class TestUpdateInstanceTag:
     """Tests for updating a instance_tag."""
 
@@ -104,8 +90,6 @@ class TestUpdateInstanceTag:
         mock_api_client.update.side_effect = Exception("404 Not Found")
         with pytest.raises(Exception, match="404 Not Found"):
             mock_api_client.update("instance_tag", "bad-id", {})
-
-
 class TestDeleteInstanceTag:
     """Tests for deleting a instance_tag."""
 
@@ -134,8 +118,6 @@ class TestDeleteInstanceTag:
         client.delete.side_effect = Exception("403 Forbidden")
         with pytest.raises(Exception, match="403 Forbidden"):
             client.delete("instance_tag", "res-123")
-
-
 class TestGetInstanceTag:
     """Tests for getting a instance_tag."""
 
@@ -157,8 +139,6 @@ class TestGetInstanceTag:
         client.get.side_effect = TimeoutError("Connection timed out")
         with pytest.raises(TimeoutError):
             client.get("instance_tag", "res-123")
-
-
 class TestListInstanceTag:
     """Tests for listing instance_tag resources."""
 
@@ -181,8 +161,6 @@ class TestListInstanceTag:
         mock_api_client.list.return_value = [{"instance_id": "1", "key": "match"}]
         result = mock_api_client.list("instance_tag", filters={"key": "match"})
         assert len(result) == 1
-
-
 class TestIdempotencyInstanceTag:
     """Tests for idempotent behavior of instance_tag."""
 
@@ -200,8 +178,6 @@ class TestIdempotencyInstanceTag:
         mock_api_client.get.return_value = None
         exists = mock_api_client.get("instance_tag", "missing") is not None
         assert exists is False
-
-
 class TestErrorHandlingInstanceTag:
     """Tests for error handling in instance_tag."""
 

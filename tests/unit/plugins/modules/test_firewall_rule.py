@@ -1,18 +1,10 @@
 """Unit tests for stevefulme1.lambdalabs.firewall_rule module."""
 
-from __future__ import absolute_import, division, print_function
-
-__metaclass__ = type
-
-from unittest.mock import MagicMock, patch
+from unittest.mock import MagicMock
 
 import pytest
-
-
 MODULE_PATH = "ansible_collections.stevefulme1.lambdalabs.plugins.modules.firewall_rule"
 CLIENT_PATH = "ansible_collections.stevefulme1.lambdalabs.plugins.module_utils.lambda_client"
-
-
 @pytest.fixture
 def mock_api_client():
     """Mock API client for firewall_rule."""
@@ -23,8 +15,6 @@ def mock_api_client():
     client.delete.return_value = None
     client.list.return_value = []
     return client
-
-
 @pytest.fixture
 def existing_resource():
     """Return a dict representing an existing firewall_rule."""
@@ -33,8 +23,6 @@ def existing_resource():
         "description": "test-firewall_rule",
         "state": "active",
     }
-
-
 class TestCreateFirewallRule:
     """Tests for creating a firewall_rule."""
 
@@ -48,7 +36,6 @@ class TestCreateFirewallRule:
     def test_create_with_all_params(self, mock_api_client):
         """Verify create passes all parameters to API."""
         params = {
-            "description": "full-firewall_rule",
             "description": "Full test",
             "tags": {"env": "test"},
         }
@@ -71,8 +58,6 @@ class TestCreateFirewallRule:
             result = mock_api_client.create("firewall_rule", {})
         assert result["changed"] is True
         mock_api_client.create.assert_not_called()
-
-
 class TestUpdateFirewallRule:
     """Tests for updating a firewall_rule."""
 
@@ -104,8 +89,6 @@ class TestUpdateFirewallRule:
         mock_api_client.update.side_effect = Exception("404 Not Found")
         with pytest.raises(Exception, match="404 Not Found"):
             mock_api_client.update("firewall_rule", "bad-id", {})
-
-
 class TestDeleteFirewallRule:
     """Tests for deleting a firewall_rule."""
 
@@ -134,8 +117,6 @@ class TestDeleteFirewallRule:
         client.delete.side_effect = Exception("403 Forbidden")
         with pytest.raises(Exception, match="403 Forbidden"):
             client.delete("firewall_rule", "res-123")
-
-
 class TestGetFirewallRule:
     """Tests for getting a firewall_rule."""
 
@@ -157,8 +138,6 @@ class TestGetFirewallRule:
         client.get.side_effect = TimeoutError("Connection timed out")
         with pytest.raises(TimeoutError):
             client.get("firewall_rule", "res-123")
-
-
 class TestListFirewallRule:
     """Tests for listing firewall_rule resources."""
 
@@ -181,8 +160,6 @@ class TestListFirewallRule:
         mock_api_client.list.return_value = [{"rule_id": "1", "description": "match"}]
         result = mock_api_client.list("firewall_rule", filters={"description": "match"})
         assert len(result) == 1
-
-
 class TestIdempotencyFirewallRule:
     """Tests for idempotent behavior of firewall_rule."""
 
@@ -200,8 +177,6 @@ class TestIdempotencyFirewallRule:
         mock_api_client.get.return_value = None
         exists = mock_api_client.get("firewall_rule", "missing") is not None
         assert exists is False
-
-
 class TestErrorHandlingFirewallRule:
     """Tests for error handling in firewall_rule."""
 

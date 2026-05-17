@@ -1,18 +1,10 @@
 """Unit tests for stevefulme1.lambdalabs.instance_availability_info module."""
 
-from __future__ import absolute_import, division, print_function
-
-__metaclass__ = type
-
-from unittest.mock import MagicMock, patch
+from unittest.mock import MagicMock
 
 import pytest
-
-
 MODULE_PATH = "ansible_collections.stevefulme1.lambdalabs.plugins.modules.instance_availability_info"
 CLIENT_PATH = "ansible_collections.stevefulme1.lambdalabs.plugins.module_utils.lambda_client"
-
-
 @pytest.fixture
 def mock_api_client():
     """Mock API client for instance_availability_info."""
@@ -23,26 +15,20 @@ def mock_api_client():
     client.delete.return_value = None
     client.list.return_value = []
     return client
-
-
 @pytest.fixture
 def existing_resource():
     """Return a dict representing an existing instance_availability_info."""
     return {
-        "region_name": "res-123",
-        "region_name": "test-instance_availability_info",
+        "region_name": "us-east-1",
         "state": "active",
     }
-
-
 class TestCreateInstanceAvailabilityInfo:
     """Tests for creating a instance_availability_info."""
 
     def test_create_returns_resource(self, mock_api_client):
         """Verify create returns resource dict with expected fields."""
         result = mock_api_client.create("instance_availability_info", {"region_name": "test-instance_availability_info"})
-        assert result["region_name"] == "res-123"
-        assert result["region_name"] == "test-instance_availability_info"
+        assert result["region_name"] == "us-east-1"
         mock_api_client.create.assert_called_once()
 
     def test_create_with_all_params(self, mock_api_client):
@@ -71,8 +57,6 @@ class TestCreateInstanceAvailabilityInfo:
             result = mock_api_client.create("instance_availability_info", {})
         assert result["changed"] is True
         mock_api_client.create.assert_not_called()
-
-
 class TestUpdateInstanceAvailabilityInfo:
     """Tests for updating a instance_availability_info."""
 
@@ -104,8 +88,6 @@ class TestUpdateInstanceAvailabilityInfo:
         mock_api_client.update.side_effect = Exception("404 Not Found")
         with pytest.raises(Exception, match="404 Not Found"):
             mock_api_client.update("instance_availability_info", "bad-id", {})
-
-
 class TestDeleteInstanceAvailabilityInfo:
     """Tests for deleting a instance_availability_info."""
 
@@ -134,8 +116,6 @@ class TestDeleteInstanceAvailabilityInfo:
         client.delete.side_effect = Exception("403 Forbidden")
         with pytest.raises(Exception, match="403 Forbidden"):
             client.delete("instance_availability_info", "res-123")
-
-
 class TestGetInstanceAvailabilityInfo:
     """Tests for getting a instance_availability_info."""
 
@@ -157,8 +137,6 @@ class TestGetInstanceAvailabilityInfo:
         client.get.side_effect = TimeoutError("Connection timed out")
         with pytest.raises(TimeoutError):
             client.get("instance_availability_info", "res-123")
-
-
 class TestListInstanceAvailabilityInfo:
     """Tests for listing instance_availability_info resources."""
 
@@ -181,8 +159,6 @@ class TestListInstanceAvailabilityInfo:
         mock_api_client.list.return_value = [{"region_name": "1", "region_name": "match"}]
         result = mock_api_client.list("instance_availability_info", filters={"region_name": "match"})
         assert len(result) == 1
-
-
 class TestIdempotencyInstanceAvailabilityInfo:
     """Tests for idempotent behavior of instance_availability_info."""
 
@@ -200,8 +176,6 @@ class TestIdempotencyInstanceAvailabilityInfo:
         mock_api_client.get.return_value = None
         exists = mock_api_client.get("instance_availability_info", "missing") is not None
         assert exists is False
-
-
 class TestErrorHandlingInstanceAvailabilityInfo:
     """Tests for error handling in instance_availability_info."""
 

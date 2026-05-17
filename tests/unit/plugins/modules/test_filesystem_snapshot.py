@@ -1,18 +1,10 @@
 """Unit tests for stevefulme1.lambdalabs.filesystem_snapshot module."""
 
-from __future__ import absolute_import, division, print_function
-
-__metaclass__ = type
-
-from unittest.mock import MagicMock, patch
+from unittest.mock import MagicMock
 
 import pytest
-
-
 MODULE_PATH = "ansible_collections.stevefulme1.lambdalabs.plugins.modules.filesystem_snapshot"
 CLIENT_PATH = "ansible_collections.stevefulme1.lambdalabs.plugins.module_utils.lambda_client"
-
-
 @pytest.fixture
 def mock_api_client():
     """Mock API client for filesystem_snapshot."""
@@ -23,8 +15,6 @@ def mock_api_client():
     client.delete.return_value = None
     client.list.return_value = []
     return client
-
-
 @pytest.fixture
 def existing_resource():
     """Return a dict representing an existing filesystem_snapshot."""
@@ -33,8 +23,6 @@ def existing_resource():
         "name": "test-filesystem_snapshot",
         "state": "active",
     }
-
-
 class TestCreateFilesystemSnapshot:
     """Tests for creating a filesystem_snapshot."""
 
@@ -71,8 +59,6 @@ class TestCreateFilesystemSnapshot:
             result = mock_api_client.create("filesystem_snapshot", {})
         assert result["changed"] is True
         mock_api_client.create.assert_not_called()
-
-
 class TestUpdateFilesystemSnapshot:
     """Tests for updating a filesystem_snapshot."""
 
@@ -104,8 +90,6 @@ class TestUpdateFilesystemSnapshot:
         mock_api_client.update.side_effect = Exception("404 Not Found")
         with pytest.raises(Exception, match="404 Not Found"):
             mock_api_client.update("filesystem_snapshot", "bad-id", {})
-
-
 class TestDeleteFilesystemSnapshot:
     """Tests for deleting a filesystem_snapshot."""
 
@@ -134,8 +118,6 @@ class TestDeleteFilesystemSnapshot:
         client.delete.side_effect = Exception("403 Forbidden")
         with pytest.raises(Exception, match="403 Forbidden"):
             client.delete("filesystem_snapshot", "res-123")
-
-
 class TestGetFilesystemSnapshot:
     """Tests for getting a filesystem_snapshot."""
 
@@ -157,8 +139,6 @@ class TestGetFilesystemSnapshot:
         client.get.side_effect = TimeoutError("Connection timed out")
         with pytest.raises(TimeoutError):
             client.get("filesystem_snapshot", "res-123")
-
-
 class TestListFilesystemSnapshot:
     """Tests for listing filesystem_snapshot resources."""
 
@@ -181,8 +161,6 @@ class TestListFilesystemSnapshot:
         mock_api_client.list.return_value = [{"snapshot_id": "1", "name": "match"}]
         result = mock_api_client.list("filesystem_snapshot", filters={"name": "match"})
         assert len(result) == 1
-
-
 class TestIdempotencyFilesystemSnapshot:
     """Tests for idempotent behavior of filesystem_snapshot."""
 
@@ -200,8 +178,6 @@ class TestIdempotencyFilesystemSnapshot:
         mock_api_client.get.return_value = None
         exists = mock_api_client.get("filesystem_snapshot", "missing") is not None
         assert exists is False
-
-
 class TestErrorHandlingFilesystemSnapshot:
     """Tests for error handling in filesystem_snapshot."""
 
