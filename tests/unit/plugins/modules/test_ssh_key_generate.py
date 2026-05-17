@@ -5,6 +5,8 @@ from unittest.mock import MagicMock
 import pytest
 MODULE_PATH = "ansible_collections.stevefulme1.lambdalabs.plugins.modules.ssh_key_generate"
 CLIENT_PATH = "ansible_collections.stevefulme1.lambdalabs.plugins.module_utils.lambda_client"
+
+
 @pytest.fixture
 def mock_api_client():
     """Mock API client for ssh_key_generate."""
@@ -15,6 +17,8 @@ def mock_api_client():
     client.delete.return_value = None
     client.list.return_value = []
     return client
+
+
 @pytest.fixture
 def existing_resource():
     """Return a dict representing an existing ssh_key_generate."""
@@ -23,6 +27,8 @@ def existing_resource():
         "name": "test-ssh_key_generate",
         "state": "active",
     }
+
+
 class TestCreateSshKeyGenerate:
     """Tests for creating a ssh_key_generate."""
 
@@ -59,6 +65,8 @@ class TestCreateSshKeyGenerate:
             result = mock_api_client.create("ssh_key_generate", {})
         assert result["changed"] is True
         mock_api_client.create.assert_not_called()
+
+
 class TestUpdateSshKeyGenerate:
     """Tests for updating a ssh_key_generate."""
 
@@ -90,6 +98,8 @@ class TestUpdateSshKeyGenerate:
         mock_api_client.update.side_effect = Exception("404 Not Found")
         with pytest.raises(Exception, match="404 Not Found"):
             mock_api_client.update("ssh_key_generate", "bad-id", {})
+
+
 class TestDeleteSshKeyGenerate:
     """Tests for deleting a ssh_key_generate."""
 
@@ -118,6 +128,8 @@ class TestDeleteSshKeyGenerate:
         client.delete.side_effect = Exception("403 Forbidden")
         with pytest.raises(Exception, match="403 Forbidden"):
             client.delete("ssh_key_generate", "res-123")
+
+
 class TestGetSshKeyGenerate:
     """Tests for getting a ssh_key_generate."""
 
@@ -139,6 +151,8 @@ class TestGetSshKeyGenerate:
         client.get.side_effect = TimeoutError("Connection timed out")
         with pytest.raises(TimeoutError):
             client.get("ssh_key_generate", "res-123")
+
+
 class TestListSshKeyGenerate:
     """Tests for listing ssh_key_generate resources."""
 
@@ -161,6 +175,8 @@ class TestListSshKeyGenerate:
         mock_api_client.list.return_value = [{"key_id": "1", "name": "match"}]
         result = mock_api_client.list("ssh_key_generate", filters={"name": "match"})
         assert len(result) == 1
+
+
 class TestIdempotencySshKeyGenerate:
     """Tests for idempotent behavior of ssh_key_generate."""
 
@@ -178,6 +194,8 @@ class TestIdempotencySshKeyGenerate:
         mock_api_client.get.return_value = None
         exists = mock_api_client.get("ssh_key_generate", "missing") is not None
         assert exists is False
+
+
 class TestErrorHandlingSshKeyGenerate:
     """Tests for error handling in ssh_key_generate."""
 
