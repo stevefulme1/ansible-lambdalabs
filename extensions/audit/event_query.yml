@@ -1,0 +1,38 @@
+---
+# extensions/audit/event_query.yml
+# Indirect Node Counting query for stevefulme1.lambdalabs
+stevefulme1.lambdalabs.instance:
+  query: >-
+    {
+      name: .instances[].name,
+      canonical_facts: {
+        uuid: .instances[].id
+      },
+      facts: {
+        device_type: "virtual_machine"
+      }
+    }
+
+stevefulme1.lambdalabs.cluster:
+  query: >-
+    {
+      name: .cluster_name,
+      canonical_facts: {
+        uuid: .instance_ids[0]
+      },
+      facts: {
+        device_type: "virtual_machine"
+      }
+    }
+
+stevefulme1.lambdalabs.filesystem:
+  query: >-
+    {
+      name: .filesystem.name,
+      canonical_facts: {
+        uuid: .filesystem.id
+      },
+      facts: {
+        device_type: "file_storage"
+      }
+    }
