@@ -67,7 +67,11 @@ def main():
 
     try:
         result = client.post("ssh-keys", data={"name": module.params["name"]})
-        module.exit_json(changed=True, ssh_key=result.get("data", {}))
+        key_data = result.get("data", {})
+        private_key = key_data.get("private_key")
+        if private_key:
+            module.no_log_values.add(private_key)
+        module.exit_json(changed=True, ssh_key=key_data)
     except LambdaError as exc:
         module.fail_json(msg=str(exc))
 

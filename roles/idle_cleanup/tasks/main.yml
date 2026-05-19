@@ -1,4 +1,13 @@
 ---
+- name: Write Lambda API key file
+  ansible.builtin.copy:
+    dest: /usr/local/etc/lambda-api-key
+    content: "{{ idle_cleanup_api_key }}"
+    mode: "0600"
+    owner: root
+    group: root
+  no_log: true
+
 - name: Install idle monitoring script
   ansible.builtin.copy:
     dest: /usr/local/bin/lambda-idle-check.sh
@@ -8,6 +17,7 @@
       # Checks GPU utilization; if idle beyond threshold, self-terminates.
       set -euo pipefail
 
+      API_KEY=$(cat /usr/local/etc/lambda-api-key)
       THRESHOLD={{ idle_cleanup_idle_threshold_minutes }}
       IDLE_FILE=/tmp/.lambda_idle_counter
 
@@ -22,7 +32,7 @@
           instance_id=$(curl -s http://169.254.169.254/latest/meta-data/instance-id 2>/dev/null || hostname)
           logger -t lambda-idle "GPU idle for ${count}m — terminating ${instance_id}"
           curl -s -X POST "https://cloud.lambda.ai/api/v1/instance-operations/terminate" \
-            -H "Authorization: Bearer {{ idle_cleanup_api_key }}" \
+            -H "Authorization: Bearer ${API_KEY}" \
             -H "Content-Type: application/json" \
             -d "{\"instance_ids\": [\"${instance_id}\"]}" || true
         fi

@@ -1,4 +1,13 @@
 ---
+- name: Write Lambda API key file
+  ansible.builtin.copy:
+    dest: /usr/local/etc/lambda-api-key
+    content: "{{ cost_tracker_api_key }}"
+    mode: "0600"
+    owner: root
+    group: root
+  no_log: true
+
 - name: Install cost tracking script
   ansible.builtin.copy:
     dest: /usr/local/bin/lambda-cost-tracker.sh
@@ -8,7 +17,7 @@
       # Query Lambda API for running instances, estimate hourly cost.
       set -euo pipefail
 
-      API_KEY="{{ cost_tracker_api_key }}"
+      API_KEY=$(cat /usr/local/etc/lambda-api-key)
       BUDGET={{ cost_tracker_budget_limit }}
       EMAIL="{{ cost_tracker_notification_email }}"
 
