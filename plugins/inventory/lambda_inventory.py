@@ -26,6 +26,7 @@ options:
     description: Lambda Labs API key.
     type: str
     required: true
+    secret: true
     env:
       - name: LAMBDA_API_KEY
   timeout:
