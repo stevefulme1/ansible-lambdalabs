@@ -10,7 +10,6 @@ description: >-
   cluster operations, filesystem management, firewall rules, and
   ML/AI operational roles (CUDA, PyTorch, vLLM, Jupyter, MLflow).
   Status: Pre-release. Under active development.
-license_file: LICENSE
 tags:
   - lambda
   - gpu
