@@ -6,8 +6,11 @@
   stevefulme1.lambdalabs.instance:
     api_key: "{{ lambdalabs_api_key }}"
     state: present
+    instance_type: "{{ test_instance_type | default('gpu_1x_a100') }}"
+    region: "{{ test_region | default('us-east-1') }}"
+    ssh_key_names:
+      - "{{ test_ssh_key | default('ansible-test-key') }}"
     name: "ansible-test-{{ resource_prefix }}"
-    validate_certs: "{{ validate_certs | default(true) }}"
   check_mode: true
   register: check_result
 
@@ -20,8 +23,11 @@
   stevefulme1.lambdalabs.instance:
     api_key: "{{ lambdalabs_api_key }}"
     state: present
+    instance_type: "{{ test_instance_type | default('gpu_1x_a100') }}"
+    region: "{{ test_region | default('us-east-1') }}"
+    ssh_key_names:
+      - "{{ test_ssh_key | default('ansible-test-key') }}"
     name: "ansible-test-{{ resource_prefix }}"
-    validate_certs: "{{ validate_certs | default(true) }}"
   register: create_result
 
 - name: Verify instance was created
@@ -34,8 +40,11 @@
   stevefulme1.lambdalabs.instance:
     api_key: "{{ lambdalabs_api_key }}"
     state: present
+    instance_type: "{{ test_instance_type | default('gpu_1x_a100') }}"
+    region: "{{ test_region | default('us-east-1') }}"
+    ssh_key_names:
+      - "{{ test_ssh_key | default('ansible-test-key') }}"
     name: "ansible-test-{{ resource_prefix }}"
-    validate_certs: "{{ validate_certs | default(true) }}"
   register: idem_result
 
 - name: Verify idempotent create
@@ -47,8 +56,9 @@
   stevefulme1.lambdalabs.instance:
     api_key: "{{ lambdalabs_api_key }}"
     state: absent
+    instance_ids:
+      - "{{ create_result.instance_ids[0] | default('test-id') }}"
     name: "ansible-test-{{ resource_prefix }}"
-    validate_certs: "{{ validate_certs | default(true) }}"
   check_mode: true
   register: delete_check
 
@@ -61,8 +71,9 @@
   stevefulme1.lambdalabs.instance:
     api_key: "{{ lambdalabs_api_key }}"
     state: absent
+    instance_ids:
+      - "{{ create_result.instance_ids[0] | default('test-id') }}"
     name: "ansible-test-{{ resource_prefix }}"
-    validate_certs: "{{ validate_certs | default(true) }}"
   register: delete_result
 
 - name: Verify instance was deleted
@@ -74,8 +85,9 @@
   stevefulme1.lambdalabs.instance:
     api_key: "{{ lambdalabs_api_key }}"
     state: absent
+    instance_ids:
+      - "{{ create_result.instance_ids[0] | default('test-id') }}"
     name: "ansible-test-{{ resource_prefix }}"
-    validate_certs: "{{ validate_certs | default(true) }}"
   register: delete_idem
 
 - name: Verify idempotent delete

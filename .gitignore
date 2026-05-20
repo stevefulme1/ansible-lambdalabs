@@ -1,46 +1,37 @@
-# Byte-compiled / optimized / DLL files
+
 __pycache__/
-*.py[cod]
-*$py.class
-
-# Virtual environments
-.venv/
-venv/
-env/
-
-# Distribution / packaging
-*.tar.gz
-dist/
-build/
-*.egg-info/
-
-# IDE / editor
-.idea/
-.vscode/
-*.swp
-*.swo
-*~
-
-# OS files
+.ansible/
+.coverage
 .DS_Store
-Thumbs.db
-
-# Ansible / collection artifacts
-*.tar.gz
-galaxy.lock
-
-# Secrets — never commit
-*.pem
-*.key
-**/vault_password*
-**/secrets.*
-
-# Testing
+.idea/
 .pytest_cache/
 .tox/
-htmlcov/
-.coverage
+.venv/
+.vscode/
+*.egg-info/
+*.key
+*.pem
+*.py[cod]
+*.swo
+*.swp
+*.tar.gz
+**/secrets.*
+**/vault_password*
+*~
+*$py.class
+# Ansible / collection artifacts
+# Byte-compiled / optimized / DLL files
+# Distribution / packaging
+# IDE / editor
+# OS files
+# Secrets — never commit
+# Testing
+# Virtual environments
+build/
 coverage.xml
-*.pyc
-.ansible/
-tests/output/
+dist/
+env/
+galaxy.lock
+htmlcov/
+Thumbs.db
+venv/

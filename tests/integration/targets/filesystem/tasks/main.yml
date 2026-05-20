@@ -7,7 +7,7 @@
     api_key: "{{ lambdalabs_api_key }}"
     state: present
     name: "ansible-test-{{ resource_prefix }}"
-    validate_certs: "{{ validate_certs | default(true) }}"
+    region: "{{ test_region | default('us-east-1') }}"
   check_mode: true
   register: check_result
 
@@ -21,7 +21,7 @@
     api_key: "{{ lambdalabs_api_key }}"
     state: present
     name: "ansible-test-{{ resource_prefix }}"
-    validate_certs: "{{ validate_certs | default(true) }}"
+    region: "{{ test_region | default('us-east-1') }}"
   register: create_result
 
 - name: Verify filesystem was created
@@ -35,7 +35,7 @@
     api_key: "{{ lambdalabs_api_key }}"
     state: present
     name: "ansible-test-{{ resource_prefix }}"
-    validate_certs: "{{ validate_certs | default(true) }}"
+    region: "{{ test_region | default('us-east-1') }}"
   register: idem_result
 
 - name: Verify idempotent create
@@ -48,7 +48,7 @@
     api_key: "{{ lambdalabs_api_key }}"
     state: absent
     name: "ansible-test-{{ resource_prefix }}"
-    validate_certs: "{{ validate_certs | default(true) }}"
+    region: "{{ test_region | default('us-east-1') }}"
   check_mode: true
   register: delete_check
 
@@ -62,7 +62,7 @@
     api_key: "{{ lambdalabs_api_key }}"
     state: absent
     name: "ansible-test-{{ resource_prefix }}"
-    validate_certs: "{{ validate_certs | default(true) }}"
+    region: "{{ test_region | default('us-east-1') }}"
   register: delete_result
 
 - name: Verify filesystem was deleted
@@ -75,7 +75,7 @@
     api_key: "{{ lambdalabs_api_key }}"
     state: absent
     name: "ansible-test-{{ resource_prefix }}"
-    validate_certs: "{{ validate_certs | default(true) }}"
+    region: "{{ test_region | default('us-east-1') }}"
   register: delete_idem
 
 - name: Verify idempotent delete

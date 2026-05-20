@@ -6,8 +6,8 @@
   stevefulme1.lambdalabs.ssh_key:
     api_key: "{{ lambdalabs_api_key }}"
     state: present
+    public_key: "{{ test_public_key | default('ssh-ed25519 AAAA test@ansible') }}"
     name: "ansible-test-{{ resource_prefix }}"
-    validate_certs: "{{ validate_certs | default(true) }}"
   check_mode: true
   register: check_result
 
@@ -20,8 +20,8 @@
   stevefulme1.lambdalabs.ssh_key:
     api_key: "{{ lambdalabs_api_key }}"
     state: present
+    public_key: "{{ test_public_key | default('ssh-ed25519 AAAA test@ansible') }}"
     name: "ansible-test-{{ resource_prefix }}"
-    validate_certs: "{{ validate_certs | default(true) }}"
   register: create_result
 
 - name: Verify ssh_key was created
@@ -34,8 +34,8 @@
   stevefulme1.lambdalabs.ssh_key:
     api_key: "{{ lambdalabs_api_key }}"
     state: present
+    public_key: "{{ test_public_key | default('ssh-ed25519 AAAA test@ansible') }}"
     name: "ansible-test-{{ resource_prefix }}"
-    validate_certs: "{{ validate_certs | default(true) }}"
   register: idem_result
 
 - name: Verify idempotent create
@@ -48,7 +48,6 @@
     api_key: "{{ lambdalabs_api_key }}"
     state: absent
     name: "ansible-test-{{ resource_prefix }}"
-    validate_certs: "{{ validate_certs | default(true) }}"
   check_mode: true
   register: delete_check
 
@@ -62,7 +61,6 @@
     api_key: "{{ lambdalabs_api_key }}"
     state: absent
     name: "ansible-test-{{ resource_prefix }}"
-    validate_certs: "{{ validate_certs | default(true) }}"
   register: delete_result
 
 - name: Verify ssh_key was deleted
@@ -75,7 +73,6 @@
     api_key: "{{ lambdalabs_api_key }}"
     state: absent
     name: "ansible-test-{{ resource_prefix }}"
-    validate_certs: "{{ validate_certs | default(true) }}"
   register: delete_idem
 
 - name: Verify idempotent delete
