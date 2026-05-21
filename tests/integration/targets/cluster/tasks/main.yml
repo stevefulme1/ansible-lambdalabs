@@ -1,0 +1,122 @@
+---
+# Integration tests for stevefulme1.lambdalabs.cluster
+
+- name: List clusters (check connectivity)
+  stevefulme1.lambdalabs.cluster_info:
+    name: "ansible-test-{{ resource_prefix }}"
+    api_key: "{{ lambdalabs_api_key }}"
+  register: list_result
+
+- name: Verify cluster listing returns a list
+  ansible.builtin.assert:
+    that:
+      - list_result.clusters is defined
+
+- name: Check cluster health
+  stevefulme1.lambdalabs.cluster_health_info:
+    name: "ansible-test-{{ resource_prefix }}"
+    api_key: "{{ lambdalabs_api_key }}"
+  register: health_result
+
+- name: Verify health info returns data
+  ansible.builtin.assert:
+    that:
+      - health_result is not failed
+
+- name: Create cluster (check_mode)
+  stevefulme1.lambdalabs.cluster:
+    api_key: "{{ lambdalabs_api_key }}"
+    name: "ansible-test-{{ resource_prefix }}"
+    instance_type: "{{ test_instance_type | default('gpu_1x_a100') }}"
+    count: 2
+    ssh_key_names: "{{ test_ssh_key_names | default(['ansible-test-key']) }}"
+    region: "{{ test_region | default('us-east-1') }}"
+  check_mode: true
+  register: check_result
+
+- name: Verify check_mode reports changed
+  ansible.builtin.assert:
+    that:
+      - check_result is changed
+
+- name: Create cluster
+  stevefulme1.lambdalabs.cluster:
+    api_key: "{{ lambdalabs_api_key }}"
+    name: "ansible-test-{{ resource_prefix }}"
+    instance_type: "{{ test_instance_type | default('gpu_1x_a100') }}"
+    count: 2
+    ssh_key_names: "{{ test_ssh_key_names | default(['ansible-test-key']) }}"
+    region: "{{ test_region | default('us-east-1') }}"
+  register: create_result
+
+- name: Verify cluster was created
+  ansible.builtin.assert:
+    that:
+      - create_result is changed
+      - create_result.cluster is defined
+
+- name: Scale cluster up (check_mode)
+  stevefulme1.lambdalabs.cluster_scale:
+    api_key: "{{ lambdalabs_api_key }}"
+    name: "ansible-test-{{ resource_prefix }}"
+    desired_count: 4
+    instance_type: "{{ test_instance_type | default('gpu_1x_a100') }}"
+    region: "{{ test_region | default('us-east-1') }}"
+    ssh_key_names: "{{ test_ssh_key_names | default(['ansible-test-key']) }}"
+  check_mode: true
+  register: scale_check
+
+- name: Verify check_mode scale reports changed
+  ansible.builtin.assert:
+    that:
+      - scale_check is changed
+
+- name: Scale cluster up
+  stevefulme1.lambdalabs.cluster_scale:
+    api_key: "{{ lambdalabs_api_key }}"
+    name: "ansible-test-{{ resource_prefix }}"
+    desired_count: 4
+    instance_type: "{{ test_instance_type | default('gpu_1x_a100') }}"
+    region: "{{ test_region | default('us-east-1') }}"
+    ssh_key_names: "{{ test_ssh_key_names | default(['ansible-test-key']) }}"
+  register: scale_result
+
+- name: Verify scale up
+  ansible.builtin.assert:
+    that:
+      - scale_result is changed
+
+- name: Terminate cluster (check_mode)
+  stevefulme1.lambdalabs.cluster_terminate:
+    api_key: "{{ lambdalabs_api_key }}"
+    name: "ansible-test-{{ resource_prefix }}"
+  check_mode: true
+  register: term_check
+
+- name: Verify check_mode terminate reports changed
+  ansible.builtin.assert:
+    that:
+      - term_check is changed
+
+- name: Terminate cluster
+  stevefulme1.lambdalabs.cluster_terminate:
+    api_key: "{{ lambdalabs_api_key }}"
+    name: "ansible-test-{{ resource_prefix }}"
+  register: term_result
+
+- name: Verify cluster was terminated
+  ansible.builtin.assert:
+    that:
+      - term_result is changed
+      - term_result.terminated_ids is defined
+
+- name: Terminate cluster again (idempotent)
+  stevefulme1.lambdalabs.cluster_terminate:
+    api_key: "{{ lambdalabs_api_key }}"
+    name: "ansible-test-{{ resource_prefix }}"
+  register: term_idem
+
+- name: Verify idempotent terminate
+  ansible.builtin.assert:
+    that:
+      - term_idem is not changed

@@ -1,0 +1,83 @@
+---
+# Integration tests for info-only modules
+
+- name: Get API key info
+  stevefulme1.lambdalabs.api_key_info:
+    api_key: "{{ lambdalabs_api_key }}"
+  register: api_key_info
+
+- name: Verify API key info
+  ansible.builtin.assert:
+    that:
+      - api_key_info is not failed
+
+- name: Get API key usage info
+  stevefulme1.lambdalabs.api_key_usage_info:
+    api_key: "{{ lambdalabs_api_key }}"
+  register: usage_info
+
+- name: Verify API key usage info
+  ansible.builtin.assert:
+    that:
+      - usage_info is not failed
+
+- name: Get instance availability info
+  stevefulme1.lambdalabs.instance_availability_info:
+    api_key: "{{ lambdalabs_api_key }}"
+  register: avail_info
+
+- name: Verify instance availability info
+  ansible.builtin.assert:
+    that:
+      - avail_info is not failed
+
+- name: Get instance pricing info
+  stevefulme1.lambdalabs.instance_pricing_info:
+    api_key: "{{ lambdalabs_api_key }}"
+  register: pricing_info
+
+- name: Verify instance pricing info
+  ansible.builtin.assert:
+    that:
+      - pricing_info is not failed
+
+- name: Get instance type info
+  stevefulme1.lambdalabs.instance_type_info:
+    api_key: "{{ lambdalabs_api_key }}"
+  register: type_info
+
+- name: Verify instance type info
+  ansible.builtin.assert:
+    that:
+      - type_info is not failed
+
+- name: Get region info
+  stevefulme1.lambdalabs.region_info:
+    api_key: "{{ lambdalabs_api_key }}"
+  register: region_info
+
+- name: Verify region info
+  ansible.builtin.assert:
+    that:
+      - region_info is not failed
+      - region_info.regions is defined
+
+- name: Get filesystem info
+  stevefulme1.lambdalabs.filesystem_info:
+    api_key: "{{ lambdalabs_api_key }}"
+  register: fs_info
+
+- name: Verify filesystem info
+  ansible.builtin.assert:
+    that:
+      - fs_info is not failed
+
+- name: Get SSH key info
+  stevefulme1.lambdalabs.ssh_key_info:
+    api_key: "{{ lambdalabs_api_key }}"
+  register: key_info
+
+- name: Verify SSH key info
+  ansible.builtin.assert:
+    that:
+      - key_info is not failed

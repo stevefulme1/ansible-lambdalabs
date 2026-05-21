@@ -1,0 +1,51 @@
+---
+# Integration tests for stevefulme1.lambdalabs.instance_restart
+
+- name: List running instances
+  stevefulme1.lambdalabs.instance_info:
+    api_key: "{{ lambdalabs_api_key }}"
+  register: instances
+
+- name: Verify instance listing
+  ansible.builtin.assert:
+    that:
+      - instances.instances is defined
+
+- name: Check instance restart info
+  stevefulme1.lambdalabs.instance_restart_info:
+    api_key: "{{ lambdalabs_api_key }}"
+  register: restart_info
+
+- name: Verify restart info
+  ansible.builtin.assert:
+    that:
+      - restart_info is not failed
+
+- name: Restart instance (check_mode)
+  stevefulme1.lambdalabs.instance_restart:
+    api_key: "{{ lambdalabs_api_key }}"
+    instance_ids:
+      - "{{ test_instance_id | default('test-instance-id') }}"
+  check_mode: true
+  register: check_result
+
+- name: Verify check_mode reports changed
+  ansible.builtin.assert:
+    that:
+      - check_result is changed
+      - check_result.restarted_ids is defined
+
+- name: Restart instance
+  stevefulme1.lambdalabs.instance_restart:
+    api_key: "{{ lambdalabs_api_key }}"
+    instance_ids:
+      - "{{ test_instance_id | default('test-instance-id') }}"
+  register: restart_result
+  when: test_instance_id is defined
+
+- name: Verify restart
+  ansible.builtin.assert:
+    that:
+      - restart_result is changed
+      - restart_result.restarted_ids is defined
+  when: test_instance_id is defined

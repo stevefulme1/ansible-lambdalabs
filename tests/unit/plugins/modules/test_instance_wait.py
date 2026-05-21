@@ -1,4 +1,4 @@
-"""Unit tests for stevefulme1.lambdalabs.cluster module."""
+"""Unit tests for stevefulme1.lambdalabs.instance_wait module."""
 
 from __future__ import absolute_import, division, print_function
 
@@ -7,17 +7,17 @@ from unittest.mock import MagicMock
 
 import pytest
 
-MODULE_PATH = "ansible_collections.stevefulme1.lambdalabs.plugins.modules.cluster"
+MODULE_PATH = "ansible_collections.stevefulme1.lambdalabs.plugins.modules.instance_wait"
 CLIENT_PATH = "ansible_collections.stevefulme1.lambdalabs.plugins.module_utils.lambda_client"
 
 
 @pytest.fixture
 def mock_api_client():
-    """Mock API client for cluster."""
+    """Mock API client for instance_wait."""
     client = MagicMock()
     client.get.return_value = None
-    client.create.return_value = {"id": "res-123", "name": "test-cluster"}
-    client.update.return_value = {"id": "res-123", "name": "test-cluster-updated"}
+    client.create.return_value = {"id": "res-123", "name": "test-instance_wait"}
+    client.update.return_value = {"id": "res-123", "name": "test-instance_wait-updated"}
     client.delete.return_value = None
     client.list.return_value = []
     return client
@@ -25,22 +25,22 @@ def mock_api_client():
 
 @pytest.fixture
 def existing_resource():
-    """Return a dict representing an existing cluster."""
+    """Return a dict representing an existing instance_wait."""
     return {
         "id": "res-123",
-        "name": "test-cluster",
+        "name": "test-instance_wait",
         "state": "active",
     }
 
 
-class TestCreateCluster:
-    """Tests for creating a cluster."""
+class TestCreateInstanceWait:
+    """Tests for creating a instance_wait."""
 
     def test_create_returns_resource(self, mock_api_client):
         """Verify create returns resource dict with expected fields."""
-        result = mock_api_client.create("cluster", {"name": "test-cluster"})
+        result = mock_api_client.create("instance_wait", {"name": "test-instance_wait"})
         assert result["id"] == "res-123"
-        assert result["name"] == "test-cluster"
+        assert result["name"] == "test-instance_wait"
         mock_api_client.create.assert_called_once()
 
     def test_create_api_error(self):
@@ -48,31 +48,31 @@ class TestCreateCluster:
         client = MagicMock()
         client.create.side_effect = Exception("409 Conflict")
         with pytest.raises(Exception, match="409 Conflict"):
-            client.create("cluster", {"name": "test"})
+            client.create("instance_wait", {"name": "test"})
 
 
-class TestDeleteCluster:
-    """Tests for deleting a cluster."""
+class TestDeleteInstanceWait:
+    """Tests for deleting a instance_wait."""
 
     def test_delete_existing(self, mock_api_client, existing_resource):
         """Verify delete is called for existing resource."""
         mock_api_client.get.return_value = existing_resource
-        mock_api_client.delete("cluster", "res-123")
-        mock_api_client.delete.assert_called_once_with("cluster", "res-123")
+        mock_api_client.delete("instance_wait", "res-123")
+        mock_api_client.delete.assert_called_once_with("instance_wait", "res-123")
 
     def test_delete_nonexistent(self, mock_api_client):
         """Verify delete handles missing resource gracefully."""
         mock_api_client.get.return_value = None
         mock_api_client.delete.side_effect = Exception("404 Not Found")
         with pytest.raises(Exception, match="404"):
-            mock_api_client.delete("cluster", "missing")
+            mock_api_client.delete("instance_wait", "missing")
 
 
-class TestIdempotencyCluster:
+class TestIdempotencyInstanceWait:
     """Tests for idempotency behavior."""
 
     def test_no_change_when_exists(self, mock_api_client, existing_resource):
         """Verify no API call when resource already in desired state."""
         mock_api_client.get.return_value = existing_resource
-        result = mock_api_client.get("cluster", "res-123")
+        result = mock_api_client.get("instance_wait", "res-123")
         assert result["id"] == "res-123"

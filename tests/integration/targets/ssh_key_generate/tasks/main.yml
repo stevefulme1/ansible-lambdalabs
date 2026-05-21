@@ -1,0 +1,49 @@
+---
+# Integration tests for stevefulme1.lambdalabs.ssh_key_generate
+
+- name: List existing SSH keys
+  stevefulme1.lambdalabs.ssh_key_generate_info:
+    api_key: "{{ lambdalabs_api_key }}"
+  register: list_result
+
+- name: Verify listing
+  ansible.builtin.assert:
+    that:
+      - list_result is not failed
+
+- name: Generate SSH key (check_mode)
+  stevefulme1.lambdalabs.ssh_key_generate:
+    api_key: "{{ lambdalabs_api_key }}"
+    name: "ansible-test-gen-{{ resource_prefix }}"
+  check_mode: true
+  register: check_result
+
+- name: Verify check_mode reports changed
+  ansible.builtin.assert:
+    that:
+      - check_result is changed
+
+- name: Generate SSH key
+  stevefulme1.lambdalabs.ssh_key_generate:
+    api_key: "{{ lambdalabs_api_key }}"
+    name: "ansible-test-gen-{{ resource_prefix }}"
+  register: gen_result
+
+- name: Verify SSH key was generated
+  ansible.builtin.assert:
+    that:
+      - gen_result is changed
+      - gen_result.ssh_key is defined
+      - gen_result.ssh_key.private_key is defined
+
+- name: Clean up generated key
+  stevefulme1.lambdalabs.ssh_key:
+    api_key: "{{ lambdalabs_api_key }}"
+    name: "ansible-test-gen-{{ resource_prefix }}"
+    state: absent
+  register: cleanup
+
+- name: Verify cleanup
+  ansible.builtin.assert:
+    that:
+      - cleanup is changed

@@ -1,0 +1,60 @@
+---
+# Integration tests for stevefulme1.lambdalabs.ssh_key_import
+
+- name: List existing SSH keys
+  stevefulme1.lambdalabs.ssh_key_import_info:
+    api_key: "{{ lambdalabs_api_key }}"
+  register: list_result
+
+- name: Verify listing
+  ansible.builtin.assert:
+    that:
+      - list_result is not failed
+
+- name: Create temporary SSH key file
+  ansible.builtin.tempfile:
+    suffix: .pub
+  register: tmpkey
+
+- name: Write test public key
+  ansible.builtin.copy:
+    content: "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIImportTest ansible-test@import"
+    dest: "{{ tmpkey.path }}"
+    mode: "0644"
+
+- name: Import SSH key from file (check_mode)
+  stevefulme1.lambdalabs.ssh_key_import:
+    api_key: "{{ lambdalabs_api_key }}"
+    name: "ansible-test-import-{{ resource_prefix }}"
+    path: "{{ tmpkey.path }}"
+  check_mode: true
+  register: check_result
+
+- name: Verify check_mode reports changed
+  ansible.builtin.assert:
+    that:
+      - check_result is changed
+
+- name: Import SSH key from file
+  stevefulme1.lambdalabs.ssh_key_import:
+    api_key: "{{ lambdalabs_api_key }}"
+    name: "ansible-test-import-{{ resource_prefix }}"
+    path: "{{ tmpkey.path }}"
+  register: import_result
+
+- name: Verify SSH key was imported
+  ansible.builtin.assert:
+    that:
+      - import_result is changed
+      - import_result.ssh_key is defined
+
+- name: Clean up imported key
+  stevefulme1.lambdalabs.ssh_key:
+    api_key: "{{ lambdalabs_api_key }}"
+    name: "ansible-test-import-{{ resource_prefix }}"
+    state: absent
+
+- name: Clean up temp file
+  ansible.builtin.file:
+    path: "{{ tmpkey.path }}"
+    state: absent
